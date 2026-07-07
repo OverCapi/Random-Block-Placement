@@ -11,9 +11,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
+// Singleton that registers and handles all keybindings for the mod
 public final class Bind {
     public static final Bind INSTANCE = new Bind();
 
+    // Custom keybinding category for organizing mod bindings in settings
     public static final KeyMapping.Category CATEGORY =
             KeyMapping.Category.register(
                     Identifier.fromNamespaceAndPath(
@@ -22,6 +24,7 @@ public final class Bind {
                     )
             );
 
+    // Keybinding: opens the block selection screen (default: B)
     private final KeyMapping openSelectionScreen =
             KeyMappingHelper.registerKeyMapping(
                     new KeyMapping(
@@ -32,6 +35,7 @@ public final class Bind {
                     )
             );
 
+    // Keybinding: toggles random block placement on/off (default: J)
     private final KeyMapping toggleBlockPlacement =
             KeyMappingHelper.registerKeyMapping(
                     new KeyMapping(
@@ -42,6 +46,7 @@ public final class Bind {
                     )
             );
 
+    // Placeholder — actual registration happens in the constructor
     public static void load() {
 
     }
@@ -50,21 +55,25 @@ public final class Bind {
         register();
     }
 
+    // Registers the client tick handler that checks for key presses
     public void register() {
         ClientTickEvents.END_CLIENT_TICK.register(this::onClientTick);
     }
 
+    // Called every client tick; processes consumed key presses
     private void onClientTick(Minecraft client) {
-
+        // Open the block selection screen when B is pressed
         while (openSelectionScreen.consumeClick()) {
             toggleSelectionScreen(client);
         }
 
+        // Toggle random placement when J is pressed
         while (toggleBlockPlacement.consumeClick()) {
             BlockPlacer.INSTANCE.toggleBlockPlacement();
         }
     }
 
+    // Opens the block selection GUI screen
     private void toggleSelectionScreen(Minecraft client) {
         client.setScreenAndShow(new BlockSelectionScreen());
     }

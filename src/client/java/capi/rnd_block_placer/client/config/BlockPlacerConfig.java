@@ -15,34 +15,44 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+// Manages persistent configuration: selected blocks, their weights, and JSON serialization
 public class BlockPlacerConfig {
     public static BlockPlacerConfig INSTANCE = new BlockPlacerConfig();
+    // Default weight assigned to newly selected blocks
     public static final int DEFAULT_WEIGHT = 100;
 
+    // Map of block identifier → weight for weighted random selection
     private HashMap<Identifier, Integer> selectedBlocks = new HashMap<>();
+    // Pretty-printing Gson instance for JSON read/write
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
+    // Returns the set of selected block identifiers (keys only)
     public Set<Identifier> getSelectedBlocksKey() {
         return selectedBlocks.keySet();
     }
 
+    // Returns the full block → weight map
     public HashMap<Identifier, Integer> getSelectedBlocks() {
         return selectedBlocks;
     }
 
+    // Returns the weight for a specific block, or null if not selected
     public Integer getSelectedBlockWeight(Identifier id) {
         return selectedBlocks.get(id);
     }
 
+    // Replaces the entire selection with a new map
     public void setSelectedBlocks(HashMap<Identifier, Integer> selectedBlocks) {
         this.selectedBlocks.clear();
         this.selectedBlocks.putAll(selectedBlocks);
     }
 
+    // Clears all selected blocks
     public void resetSelectedBlocks() {
         selectedBlocks.clear();
     }
 
+    // Persists the current selection to the config file as JSON
     public void save() {
         try {
             JsonObject root = new JsonObject();
@@ -57,6 +67,7 @@ public class BlockPlacerConfig {
         }
     }
 
+    // Loads the selection from the config file, merging into the current map
     public void load() {
         try {
             Path path = getConfigPath();
@@ -78,6 +89,7 @@ public class BlockPlacerConfig {
         }
     }
 
+    // Returns the config file path: <config-dir>/rnd-block-placer.json
     private static Path getConfigPath() {
         return FabricLoader.getInstance().getConfigDir().resolve("rnd-block-placer.json");
     }

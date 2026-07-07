@@ -17,14 +17,17 @@ import net.minecraft.world.item.ItemStack;
 
 import static capi.rnd_block_placer.client.screen.BlockSelectionScreenConstant.*;
 
+// GUI screen for selecting blocks and configuring their weights for random placement
 public class BlockSelectionScreen extends Screen {
+	// State and renderer separated for cleaner architecture
 	private BlockSelectionScreenState blockSelectionScreenState = new BlockSelectionScreenState();
 	private BlockSelectionScreenRenderer blockSelectionScreenRenderer = new BlockSelectionScreenRenderer();
 
+	// Container position (centered on screen)
 	private int leftPos;
 	private int topPos;
 
-	// TODO Abstraction
+	// Weight editing UI components (TODO: extract into dedicated editor component)
 	private EditBox weightInput;
 	private Identifier editingSlot;
 	private boolean editingNewBlock;
@@ -34,17 +37,20 @@ public class BlockSelectionScreen extends Screen {
 		super(Component.literal("Random Block Placer"));
 	}
 
+	// Builds the toggle button text showing current ENABLE/DISABLE status
 	private Component makeToggleText() {
 		return Component.literal(
 				"STATUS : " + (blockSelectionScreenState.isRndPlacementEnabled() ? "§aENABLE" : "§cDISABLE")
 		);
 	}
 
+	// Toggles the working placement status and updates the button label
 	private void toggleWorkingStatus(Button button) {
 		blockSelectionScreenState.toggleRndPlacement();
 		button.setMessage(makeToggleText());
 	}
 
+	// Creates the enable/disable toggle button above the container
 	private void initWorkingStatusButton() {
 		addRenderableWidget(Button.builder(
 				makeToggleText(),
@@ -52,6 +58,7 @@ public class BlockSelectionScreen extends Screen {
 		).pos(leftPos + IMAGE_W / 2 - 80, topPos - 28).size(160, 20).build());
 	}
 
+	// Persists the working state to config and closes the screen
 	private void save(Button button) {
 		BlockPlacer blockPlacer = BlockPlacer.INSTANCE;
 		BlockPlacerConfig blockPlacerConfig = blockPlacer.getBlockPlacerConfig();
@@ -68,6 +75,7 @@ public class BlockSelectionScreen extends Screen {
 		onClose();
 	}
 
+	// Creates the Save button below the container
 	private void initSaveButton() {
 		addRenderableWidget(Button.builder(
 				Component.literal("Save"),
@@ -75,10 +83,12 @@ public class BlockSelectionScreen extends Screen {
 		).pos(leftPos + IMAGE_W / 2 - 80, topPos + IMAGE_H + 8).size(70, 20).build());
 	}
 
+	// Resets the working state (clears selection, disables placement)
 	private void reset(Button button) {
 		blockSelectionScreenState.reset();
 	}
 
+	// Creates the Reset button below the container
 	private void initResetButton() {
 		addRenderableWidget(Button.builder(
 				Component.literal("Reset"),
@@ -86,6 +96,7 @@ public class BlockSelectionScreen extends Screen {
 		).pos(leftPos + IMAGE_W / 2 + 10, topPos + IMAGE_H + 8).size(60, 20).build());
 	}
 
+	// Initializes the weight input field (hidden by default, shown on Shift+click)
 	private void initWeightInput() {
 		weightInput = new EditBox(
 				font,
@@ -109,17 +120,20 @@ public class BlockSelectionScreen extends Screen {
 	protected void init() {
 		super.init();
 
+		// Load working state from the current config
 		blockSelectionScreenState.init();
 
+		// Center the container on screen
 		leftPos = (width - IMAGE_W) / 2;
 		topPos = (height - IMAGE_H) / 2;
 
-
+		// Build UI components
 		initWorkingStatusButton();
 		initSaveButton();
 		initResetButton();
 		initWeightInput();
 
+		// Initialize the custom renderer
 		blockSelectionScreenRenderer.init(leftPos, topPos, font, minecraft);
 	}
 
@@ -132,14 +146,17 @@ public class BlockSelectionScreen extends Screen {
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor extract, int mx, int my, float delta) {
 		super.extractRenderState(extract, mx, my, delta);
+		// Delegate rendering to the dedicated renderer
 		blockSelectionScreenRenderer.setCurrentState(blockSelectionScreenState);
 		blockSelectionScreenRenderer.render(extract, mx, my, delta);
 
+		// Draw the weight label when editing is active
 		if (weightInput.isVisible() && editingSlot != null) {
 			extract.text(font, weightLabel, leftPos + SLOT_X, topPos + IMAGE_H - 4 - 10, 0xCCCCCC);
 		}
 	}
 
+	// Opens the weight editor for a given block slot
 	private void startEditingWeight(Identifier id, ItemStack stack) {
 		editingSlot = id;
 		editingNewBlock = !blockSelectionScreenState.getWorkingWeights().containsKey(id);
@@ -153,6 +170,7 @@ public class BlockSelectionScreen extends Screen {
 		weightLabel = Component.literal("§7Weights for " + name + ":");
 	}
 
+	// Closes the weight editor without saving
 	private void stopEditingWeight() {
 		if (editingSlot != null && editingNewBlock) {
 			editingNewBlock = false;
@@ -167,6 +185,7 @@ public class BlockSelectionScreen extends Screen {
 		if (consumed) {
 			return super.mouseClicked(event, consumed);
 		}
+		// Only handle left-click
 		if (event.buttonInfo().button() != 0) {
 			return super.mouseClicked(event, consumed);
 		}
@@ -179,32 +198,38 @@ public class BlockSelectionScreen extends Screen {
 		double mx = event.x();
 		double my = event.y();
 
+		// Calculate which inventory slot was clicked
 		int col = (int) ((mx - leftPos - SLOT_X) / SLOT_SIZE);
 		int row;
 		if (my >= topPos + HOTBAR_Y && my < topPos + HOTBAR_Y + SLOT_SIZE) {
-			row = 3;
+			row = 3; // Hotbar row
 		} else {
 			row = (int) ((my - topPos - MAIN_Y) / SLOT_SIZE);
 		}
 
+		// Validate click is within inventory bounds
 		if (!(col >= 0 && col < INVENTORY_COL && row >= 0 && row < INVENTORY_ROW)) {
 			return super.mouseClicked(event, consumed);
 		}
 
+		// Map grid position to inventory slot index
 		int slotIndex = (row == 3) ? col : 9 + row * INVENTORY_COL + col;
 		ItemStack stack = player.getInventory().getItem(slotIndex);
 
+		// Only block items can be selected
 		if (!(stack.getItem() instanceof BlockItem)) {
 			return super.mouseClicked(event, consumed);
 		}
 
 		Identifier id = BuiltInRegistries.ITEM.getKey(stack.getItem());
 
+		// Shift+click opens the weight editor; regular click toggles selection
 		if (event.hasShiftDown()) {
 			startEditingWeight(id, stack);
 			return true;
 		}
 
+		// Toggle block selection (add with default weight or remove)
 		if (blockSelectionScreenState.getWorkingWeights().containsKey(id)) {
 			blockSelectionScreenState.getWorkingWeights().remove(id);
 		} else {
@@ -216,6 +241,7 @@ public class BlockSelectionScreen extends Screen {
 		return true;
 	}
 
+	// Parses and applies the weight from the input field, then closes the editor
 	private void confirmWeight() {
 		if (editingSlot == null) return;
 		try {
@@ -226,13 +252,14 @@ public class BlockSelectionScreen extends Screen {
 				blockSelectionScreenState.getWorkingWeights().put(editingSlot, w);
 			}
 		} catch (NumberFormatException e) {
+			// Invalid input — ignore silently
 		}
 		stopEditingWeight();
 	}
 
-
 	@Override
 	public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+		// Handle Enter (confirm) and Escape (cancel) when weight editor is open
 		if (weightInput.isVisible()) {
 			if (event.isEscape()) {
 				stopEditingWeight();

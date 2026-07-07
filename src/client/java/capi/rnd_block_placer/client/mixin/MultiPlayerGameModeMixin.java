@@ -28,24 +28,31 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 
+// Mixin that intercepts block placement to swap to a randomly selected block before placement
 @Mixin(MultiPlayerGameMode.class)
 public class MultiPlayerGameModeMixin {
 
+	// Whether a swap is currently in progress
 	@Unique
 	private boolean rbp$swapped = false;
 
+	// The player's original hotbar slot before the swap
 	@Unique
 	private int rbp$originalSlot;
 
+	// Whether the swap involved an inventory slot (outside hotbar) via ContainerInput
 	@Unique
 	private boolean rbp$invSwapped = false;
 
+	// The inventory slot that was swapped into the hotbar
 	@Unique
 	private int rbp$invSlot = -1;
 
+	// Internal record representing an eligible slot with its stack and configured weight
 	@Unique
 	private record SlotEntry(int slot, ItemStack stack, int weight) {}
 
+	// Scans the inventory for slots containing selected blocks and returns them with their weights
 	@Unique
 	private HashMap<Identifier, SlotEntry> rbp$getEligibleSlots(Inventory inventory) {
 		HashMap<Identifier, SlotEntry> eligibleSlots = new HashMap<Identifier, SlotEntry>();
@@ -70,6 +77,7 @@ public class MultiPlayerGameModeMixin {
 		return eligibleSlots;
 	}
 
+	// Weighted random selection from eligible slots using the configured weights
 	@Unique
 	private SlotEntry rbp$getRandomSlotEntry(HashMap<Identifier, SlotEntry> eligibleSlots, RandomSource randomSource) {
 		int totalWeight = 0;
@@ -82,13 +90,14 @@ public class MultiPlayerGameModeMixin {
 		for (Identifier blockItemId : eligibleSlots.keySet()) {
 			int eligibleSlotWeight = eligibleSlots.get(blockItemId).weight;
 			cumulativeWeight += eligibleSlotWeight;
-			if  (randomInteger < cumulativeWeight) {
+			if (randomInteger < cumulativeWeight) {
 				return eligibleSlots.get(blockItemId);
 			}
 		}
 		return null;
 	}
 
+	// Checks that all selected blocks are present in the player's inventory; warns about missing ones
 	@Unique
 	private boolean rbp$isBlocksMissing(BlockPlacerConfig blockPlacerConfig, LocalPlayer player) {
 		Set<Identifier> selectedBlocks = blockPlacerConfig.getSelectedBlocksKey();
@@ -113,6 +122,7 @@ public class MultiPlayerGameModeMixin {
 			}
 		}
 
+		// Send a warning message listing missing materials
 		if (!missing.isEmpty()) {
 			StringBuilder sb = new StringBuilder("§c[RBP] Missing materials : §e");
 			boolean first = true;
@@ -130,6 +140,7 @@ public class MultiPlayerGameModeMixin {
 		return !missing.isEmpty();
 	}
 
+	// Before block placement: swap to a randomly selected block based on configured weights
 	@Inject(
 		method = "useItemOn",
 		at = @At("HEAD")
@@ -162,16 +173,19 @@ public class MultiPlayerGameModeMixin {
 
 		SlotEntry randomSlotEntry = rbp$getRandomSlotEntry(eligibleSlots, player.getRandom());
 
+		// Save current slot state for restoration after placement
 		rbp$originalSlot = player.getInventory().getSelectedSlot();
 		rbp$swapped = true;
 		rbp$invSwapped = false;
 		rbp$invSlot = -1;
 
+		// If the selected block is in the hotbar, just switch to it
 		if (randomSlotEntry.slot() < Inventory.SELECTION_SIZE) {
 			player.getInventory().setSelectedSlot(randomSlotEntry.slot);
 			return;
 		}
 
+		// If the block is in the main inventory, swap it with the current hotbar slot
 		MultiPlayerGameMode self = (MultiPlayerGameMode) (Object) this;
 		self.handleContainerInput(
 				InventoryMenu.CONTAINER_ID,
@@ -186,6 +200,7 @@ public class MultiPlayerGameModeMixin {
 		rbp$invSlot = randomSlotEntry.slot();
 	}
 
+	// After block placement: restore the original slot and sync with the server
 	@Inject(
 		method = "useItemOn",
 		at = @At("RETURN")
@@ -200,6 +215,7 @@ public class MultiPlayerGameModeMixin {
 			return;
 		}
 
+		// Swap back the inventory slot if one was used
 		if (rbp$invSwapped && rbp$invSlot != -1) {
 			MultiPlayerGameMode self = (MultiPlayerGameMode) (Object) this;
 			self.handleContainerInput(
@@ -211,6 +227,7 @@ public class MultiPlayerGameModeMixin {
 			);
 		}
 
+		// Restore the original hotbar selection and sync with server
 		player.getInventory().setSelectedSlot(rbp$originalSlot);
 		((MultiPlayerGameModeAccessor) this).callEnsureHasSentCarriedItem();
 
