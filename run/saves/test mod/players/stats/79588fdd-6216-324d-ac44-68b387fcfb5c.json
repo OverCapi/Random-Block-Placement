@@ -1,0 +1,24 @@
+{
+  "stats": {
+    "minecraft:custom": {
+      "minecraft:time_since_rest": 458,
+      "minecraft:walk_one_cm": 3445,
+      "minecraft:total_world_time": 1765,
+      "minecraft:leave_game": 1,
+      "minecraft:crouch_one_cm": 53,
+      "minecraft:sneak_time": 6,
+      "minecraft:play_time": 458,
+      "minecraft:time_since_death": 458
+    },
+    "minecraft:used": {
+      "minecraft:jungle_planks": 4,
+      "minecraft:black_wool": 1,
+      "minecraft:light_gray_wool": 2,
+      "minecraft:jungle_log": 2,
+      "minecraft:yellow_wool": 3,
+      "minecraft:stripped_jungle_log": 1,
+      "minecraft:white_wool": 14
+    }
+  },
+  "DataVersion": 4903
+}

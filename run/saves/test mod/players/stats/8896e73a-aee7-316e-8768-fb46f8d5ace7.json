@@ -1,0 +1,27 @@
+{
+  "stats": {
+    "minecraft:dropped": {
+      "minecraft:stripped_birch_log": 56
+    },
+    "minecraft:custom": {
+      "minecraft:time_since_rest": 3115,
+      "minecraft:walk_one_cm": 34374,
+      "minecraft:total_world_time": 4237,
+      "minecraft:crouch_one_cm": 156,
+      "minecraft:sneak_time": 16,
+      "minecraft:play_time": 3115,
+      "minecraft:jump": 1,
+      "minecraft:time_since_death": 3115,
+      "minecraft:drop": 1
+    },
+    "minecraft:used": {
+      "minecraft:spruce_wood": 80,
+      "minecraft:stripped_spruce_log": 49,
+      "minecraft:stripped_birch_log": 22,
+      "minecraft:jungle_log": 34,
+      "minecraft:stripped_jungle_log": 83,
+      "minecraft:birch_log": 73
+    }
+  },
+  "DataVersion": 4903
+}

@@ -1,0 +1,22 @@
+{
+  "stats": {
+    "minecraft:used": {
+      "minecraft:jungle_planks": 128,
+      "minecraft:jungle_wood": 15,
+      "minecraft:light_gray_wool": 140,
+      "minecraft:jungle_log": 22,
+      "minecraft:stripped_jungle_log": 33
+    },
+    "minecraft:custom": {
+      "minecraft:time_since_rest": 6727,
+      "minecraft:walk_one_cm": 8860,
+      "minecraft:total_world_time": 18225,
+      "minecraft:fly_one_cm": 18648,
+      "minecraft:sneak_time": 84,
+      "minecraft:play_time": 6727,
+      "minecraft:jump": 5,
+      "minecraft:time_since_death": 6727
+    }
+  },
+  "DataVersion": 4903
+}

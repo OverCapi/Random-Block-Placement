@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "capi.rnd_block_placer.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}

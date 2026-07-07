@@ -1,0 +1,24 @@
+{
+  "stats": {
+    "minecraft:custom": {
+      "minecraft:sprint_one_cm": 1077,
+      "minecraft:time_since_rest": 1925,
+      "minecraft:walk_one_cm": 13440,
+      "minecraft:total_world_time": 2652,
+      "minecraft:leave_game": 1,
+      "minecraft:fly_one_cm": 4882,
+      "minecraft:crouch_one_cm": 99,
+      "minecraft:sneak_time": 65,
+      "minecraft:play_time": 1925,
+      "minecraft:jump": 3,
+      "minecraft:time_since_death": 1925
+    },
+    "minecraft:used": {
+      "minecraft:spruce_log": 6,
+      "minecraft:brown_wool": 38,
+      "minecraft:lime_wool": 58,
+      "minecraft:pink_wool": 30
+    }
+  },
+  "DataVersion": 4903
+}
