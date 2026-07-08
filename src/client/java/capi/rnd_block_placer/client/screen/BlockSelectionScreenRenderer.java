@@ -45,11 +45,17 @@ public class BlockSelectionScreenRenderer {
     private void drawBackground(GuiGraphicsExtractor extract) {
         extract.blit(
                 RenderPipelines.GUI_TEXTURED,
-                BlockSelectionScreenConstant.CONTAINER_BG,
-                leftPos, topPos,
-                0.0f, 0.0f,
-                IMAGE_W, IMAGE_H,
-                256, 256
+                SELECTION_MENU_TEXTURE,
+                leftPos,
+                topPos,
+                0,
+                0,
+                DISPLAY_IMAGE_W,
+                DISPLAY_IMAGE_H,
+                IMAGE_W,
+                IMAGE_H,
+                256,
+                256
         );
     }
 
@@ -87,7 +93,7 @@ public class BlockSelectionScreenRenderer {
         List<Map.Entry<Identifier, Integer>> workingWeightSorted = new ArrayList<>(currentState.getWorkingWeights().entrySet());
         workingWeightSorted.sort((a, b) -> b.getValue().compareTo(a.getValue()));
 
-        int maxY = topPos + IMAGE_H - 10;
+        int maxY = topPos + DISPLAY_IMAGE_H - 10;
         int yOff = panelY;
         int shown = 0;
         int maxRows = (maxY - panelY) / 20;
@@ -132,19 +138,17 @@ public class BlockSelectionScreenRenderer {
 
                 boolean selected = blockId != null && currentState.getWorkingWeights().containsKey(blockId);
 
-                int x = leftPos + SLOT_X + col * SLOT_SIZE;
-                int yOff = (row == 3) ? HOTBAR_Y : MAIN_Y + row * SLOT_SIZE;
+                int x = leftPos + SLOT_X + col * (SLOT_SIZE + SLOT_PADDING_X);
+                int yOff = (row == 3) ? HOTBAR_Y : MAIN_Y + row * (SLOT_SIZE + SLOT_PADDING_Y);
                 int y = topPos + yOff;
 
                 // Draw slot background: green if selected, default sprite otherwise
                 if (selected) {
                     extract.fill(x, y, x + SLOT_SIZE, y + SLOT_SIZE, GREEN_SEL);
-                } else {
-                    extract.blitSprite(RenderPipelines.GUI_TEXTURED, SLOT, x, y, SLOT_SIZE, SLOT_SIZE);
                 }
 
                 if (!itemStack.isEmpty()) {
-                    extract.item(itemStack, x + 1, y + 1);
+                    extract.item(itemStack, x - 1, y - 1);
                     // Show weight number overlay on selected blocks
                     if (selected) {
                         int w = currentState.getWorkingWeights().get(blockId);

@@ -50,16 +50,8 @@ public class BlockSelectionScreen extends Screen {
 		button.setMessage(makeToggleText());
 	}
 
-	// Creates the enable/disable toggle button above the container
-	private void initWorkingStatusButton() {
-		addRenderableWidget(Button.builder(
-				makeToggleText(),
-				this::toggleWorkingStatus
-		).pos(leftPos + IMAGE_W / 2 - 80, topPos - 28).size(160, 20).build());
-	}
-
 	// Persists the working state to config and closes the screen
-	private void save(Button button) {
+	private void save() {
 		BlockPlacer blockPlacer = BlockPlacer.INSTANCE;
 		BlockPlacerConfig blockPlacerConfig = blockPlacer.getBlockPlacerConfig();
 
@@ -75,25 +67,10 @@ public class BlockSelectionScreen extends Screen {
 		onClose();
 	}
 
-	// Creates the Save button below the container
-	private void initSaveButton() {
-		addRenderableWidget(Button.builder(
-				Component.literal("Save"),
-				this::save
-		).pos(leftPos + IMAGE_W / 2 - 80, topPos + IMAGE_H + 8).size(70, 20).build());
-	}
 
 	// Resets the working state (clears selection, disables placement)
-	private void reset(Button button) {
+	private void reset() {
 		blockSelectionScreenState.reset();
-	}
-
-	// Creates the Reset button below the container
-	private void initResetButton() {
-		addRenderableWidget(Button.builder(
-				Component.literal("Reset"),
-				this::reset
-		).pos(leftPos + IMAGE_W / 2 + 10, topPos + IMAGE_H + 8).size(60, 20).build());
 	}
 
 	// Initializes the weight input field (hidden by default, shown on Shift+click)
@@ -101,7 +78,7 @@ public class BlockSelectionScreen extends Screen {
 		weightInput = new EditBox(
 				font,
 				leftPos + SLOT_X,
-				topPos + IMAGE_H - 4,
+				topPos + DISPLAY_IMAGE_H - 4,
 				60,
 				16,
 				Component.literal("Weight")
@@ -124,13 +101,9 @@ public class BlockSelectionScreen extends Screen {
 		blockSelectionScreenState.init();
 
 		// Center the container on screen
-		leftPos = (width - IMAGE_W) / 2;
-		topPos = (height - IMAGE_H) / 2;
+		leftPos = (width - DISPLAY_IMAGE_W) / 2;
+		topPos = (height - DISPLAY_IMAGE_H) / 2;
 
-		// Build UI components
-		initWorkingStatusButton();
-		initSaveButton();
-		initResetButton();
 		initWeightInput();
 
 		// Initialize the custom renderer
@@ -152,7 +125,7 @@ public class BlockSelectionScreen extends Screen {
 
 		// Draw the weight label when editing is active
 		if (weightInput.isVisible() && editingSlot != null) {
-			extract.text(font, weightLabel, leftPos + SLOT_X, topPos + IMAGE_H - 4 - 10, 0xCCCCCC);
+			extract.text(font, weightLabel, leftPos + SLOT_X, topPos + DISPLAY_IMAGE_H - 4 - 10, 0xCCCCCC);
 		}
 	}
 
@@ -198,13 +171,21 @@ public class BlockSelectionScreen extends Screen {
 		double mx = event.x();
 		double my = event.y();
 
+		if (mx > 201 + leftPos && mx < 213 + leftPos && my > 81 + topPos && my < 93 + topPos) {
+			this.save();
+			return super.mouseClicked(event, consumed);
+		} else if (mx > 201 + leftPos && mx < 213 + leftPos && my > 28 + topPos && my < 40 + topPos) {
+			this.reset();
+			return super.mouseClicked(event, consumed);
+		}
+
 		// Calculate which inventory slot was clicked
-		int col = (int) ((mx - leftPos - SLOT_X) / SLOT_SIZE);
+		int col = (int) ((mx - leftPos - SLOT_X) / (SLOT_SIZE + SLOT_PADDING_X));
 		int row;
 		if (my >= topPos + HOTBAR_Y && my < topPos + HOTBAR_Y + SLOT_SIZE) {
 			row = 3; // Hotbar row
 		} else {
-			row = (int) ((my - topPos - MAIN_Y) / SLOT_SIZE);
+			row = (int) ((my - topPos - MAIN_Y) / (SLOT_SIZE + SLOT_PADDING_Y));
 		}
 
 		// Validate click is within inventory bounds

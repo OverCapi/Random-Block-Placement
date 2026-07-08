@@ -1,29 +1,36 @@
 package capi.rnd_block_placer.client.screen;
 
+import capi.rnd_block_placer.RandomBlockPlacer;
 import net.minecraft.resources.Identifier;
 
 // Constants for the block selection screen layout, textures, and colors
 public class BlockSelectionScreenConstant {
-    // Background texture: vanilla inventory container
-    public static final Identifier CONTAINER_BG =
-            Identifier.withDefaultNamespace("textures/gui/container/inventory.png");
+    // Selection menu asset
+    public static final Identifier SELECTION_MENU_TEXTURE =
+            Identifier.fromNamespaceAndPath(
+                    RandomBlockPlacer.MOD_ID,
+                    "textures/gui/selection_menu.png"
+            );
+    public static final int IMAGE_W = 147;
+    public static final int IMAGE_H = 75;
+    public static final int DISPLAY_IMAGE_W = 220;
+    public static final int DISPLAY_IMAGE_H = 112;
+
     // Slot sprite
     public static final Identifier SLOT =
             Identifier.withDefaultNamespace("container/slot");
-
-    // Container background dimensions
-    public static final int IMAGE_W = 176;
-    public static final int IMAGE_H = 166;
 
     // Inventory grid: 4 rows (3 main + 1 hotbar) x 9 columns
     public static final int INVENTORY_ROW = 4;
     public static final int INVENTORY_COL = 9;
 
     // Slot size and positioning within the container
-    public static final int SLOT_SIZE = 18;
-    public static final int SLOT_X = 8;
-    public static final int MAIN_Y = 84;
-    public static final int HOTBAR_Y = 142;
+    public static final int SLOT_SIZE = 14;
+    public static final int SLOT_X = 10;
+    public static final int SLOT_PADDING_X = 7;
+    public static final int SLOT_PADDING_Y = 12;
+    public static final int MAIN_Y = 12;
+    public static final int HOTBAR_Y = 88;
 
     // Selection highlight color (green)
     public static final int GREEN_SEL = 0xFF00CC00;
