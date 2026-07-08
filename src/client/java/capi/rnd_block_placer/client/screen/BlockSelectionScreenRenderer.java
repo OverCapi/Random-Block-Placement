@@ -112,9 +112,16 @@ public class BlockSelectionScreenRenderer {
                 break;
             }
 
+            int realWeight = weight * 100 / totalWeight;
+
+            Component component = Component.literal(
+              String.format("%d%% (%d%%)",  realWeight, weight)
+            );
+
             // Render item icon and percentage
-            extract.item(st, panelX, yOff);
-            extract.text(font, Component.literal("§f" + weight * 100 / totalWeight + "%"), panelX + 18, yOff + 4, 0xFFFFFFFF);
+            int x = Math.max(panelX, 0);
+            extract.item(st, x, yOff);
+            extract.text(font, component, x + 18, yOff + 4, 0xFFFFFFFF);
             yOff += 20;
         }
     }
