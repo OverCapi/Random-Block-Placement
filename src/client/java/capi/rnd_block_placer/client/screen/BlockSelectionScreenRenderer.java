@@ -115,7 +115,7 @@ public class BlockSelectionScreenRenderer {
             int realWeight = weight * 100 / totalWeight;
 
             Component component = Component.literal(
-              String.format("%d%% (%d%%)",  realWeight, weight)
+              String.format("%d%% (%d)",  realWeight, weight)
             );
 
             // Render item icon and percentage
