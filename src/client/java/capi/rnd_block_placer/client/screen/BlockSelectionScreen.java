@@ -9,9 +9,13 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 
@@ -172,9 +176,11 @@ public class BlockSelectionScreen extends Screen {
 		double my = event.y();
 
 		if (mx > 201 + leftPos && mx < 213 + leftPos && my > 81 + topPos && my < 93 + topPos) {
+			player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 2f, 0.7f);
 			this.save();
 			return super.mouseClicked(event, consumed);
 		} else if (mx > 201 + leftPos && mx < 213 + leftPos && my > 28 + topPos && my < 40 + topPos) {
+			player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 2f, 0.7f);
 			this.reset();
 			return super.mouseClicked(event, consumed);
 		}
