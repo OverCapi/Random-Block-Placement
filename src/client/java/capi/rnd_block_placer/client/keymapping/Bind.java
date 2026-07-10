@@ -13,8 +13,6 @@ import org.lwjgl.glfw.GLFW;
 
 // Singleton that registers and handles all keybindings for the mod
 public final class Bind {
-    public static final Bind INSTANCE = new Bind();
-
     // Custom keybinding category for organizing mod bindings in settings
     public static final KeyMapping.Category CATEGORY =
             KeyMapping.Category.register(
@@ -30,7 +28,7 @@ public final class Bind {
                     new KeyMapping(
                             "key." + RandomBlockPlacer.MOD_ID + ".toggle_selection_screen",
                             InputConstants.Type.KEYSYM,
-                            GLFW.GLFW_KEY_B,
+                            InputConstants.KEY_B,
                             CATEGORY
                     )
             );
@@ -46,10 +44,10 @@ public final class Bind {
                     )
             );
 
-    // Placeholder — actual registration happens in the constructor
-    public static void load() {
+    public static final Bind INSTANCE = new Bind();
 
-    }
+    // Placeholder — actual registration happens in the constructor
+    public static void load() {}
 
     private Bind() {
         register();

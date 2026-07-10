@@ -21,7 +21,7 @@ public class HudRndBlockPlacer {
                     // Display "ENABLE" in the top-right corner
                     String text = "§aENABLE";
                     int tw = mc.font.width(text);
-                    int x = mc.getWindow().getGuiScaledWidth() - tw - 4;
+                    int x = mc.getWindow().getGuiScaledWidth() / 2 - tw / 2;
                     int y = 4;
                     extract.text(mc.font, Component.literal(text), x, y, 0xFFFFFFFF);
                 }

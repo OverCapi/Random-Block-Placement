@@ -1,4 +1,5 @@
 {
+	"key.category.rnd-block-placer.rnd-block-placement": "Random Block Placement",
 	"key.rnd-block-placer.toggle_selection_screen": "Toggle block selection screen",
 	"key.rnd-block-placer.toggle_block_placement": "Toggle block placement",
 	"category.rnd-block-placer": "Random Block Placement"

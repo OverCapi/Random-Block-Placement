@@ -41,19 +41,6 @@ public class BlockSelectionScreen extends Screen {
 		super(Component.literal("Random Block Placer"));
 	}
 
-	// Builds the toggle button text showing current ENABLE/DISABLE status
-	private Component makeToggleText() {
-		return Component.literal(
-				"STATUS : " + (blockSelectionScreenState.isRndPlacementEnabled() ? "§aENABLE" : "§cDISABLE")
-		);
-	}
-
-	// Toggles the working placement status and updates the button label
-	private void toggleWorkingStatus(Button button) {
-		blockSelectionScreenState.toggleRndPlacement();
-		button.setMessage(makeToggleText());
-	}
-
 	// Persists the working state to config and closes the screen
 	private void save() {
 		BlockPlacer blockPlacer = BlockPlacer.INSTANCE;
