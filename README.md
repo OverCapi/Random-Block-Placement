@@ -9,8 +9,7 @@ Whether you're building organic structures, adding variation to walls, or creati
 ---
 
 ## Demo
-
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/gzuZTy42xg0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+<video src="Random Block Placement DEMO.mp4" controls></video>
 
 ---
 
