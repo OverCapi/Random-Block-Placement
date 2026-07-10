@@ -9,8 +9,7 @@ Whether you're building organic structures, adding variation to walls, or creati
 ---
 
 ## Demo
-[<video src="Random Block Placement DEMO.mp4" controls></video>](https://youtu.be/gzuZTy42xg0)
-
+Link to the demo video on Youtube https://youtu.be/gzuZTy42xg0
 ---
 
 ## Features
