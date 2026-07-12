@@ -1,0 +1,282 @@
+# Instincts generated from https://github.com/OverCapi/Random-Block-Placement
+# Generated: 2026-07-12T16:26:29.103Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: Random-Block-Placement-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/OverCapi/Random-Block-Placement
+---
+
+# Random Block Placement Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: refactor
+
+## Evidence
+
+- 1 commits analyzed
+- Detected conventional commit pattern
+- Examples: Refactor(Selection Screen Button): Add CustomButton widget class for Reset and Save button
+
+---
+id: Random-Block-Placement-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/OverCapi/Random-Block-Placement
+---
+
+# Random Block Placement Commit Length
+
+## Action
+
+Write moderate-length commit messages (~90 characters)
+
+## Evidence
+
+- Average commit message length: 90 chars
+- Based on 1 commits
+
+---
+id: Random-Block-Placement-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/OverCapi/Random-Block-Placement
+---
+
+# Random Block Placement Naming Files
+
+## Action
+
+Use PascalCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: PascalCase
+
+---
+id: Random-Block-Placement-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/OverCapi/Random-Block-Placement
+---
+
+# Random Block Placement Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: Random-Block-Placement-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/OverCapi/Random-Block-Placement
+---
+
+# Random Block Placement Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: Random-Block-Placement-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/OverCapi/Random-Block-Placement
+---
+
+# Random Block Placement Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: random-block-placement-instinct-class-naming
+trigger: "When creating a new Java class file"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: OverCapi/Random-Block-Placement
+---
+
+# Random Block Placement Instinct Class Naming
+
+## Action
+
+Name the file and class using PascalCase
+
+## Evidence
+
+- Pattern in namingConventions.files: PascalCase
+- Pattern in namingConventions.classes: PascalCase
+
+---
+id: random-block-placement-instinct-function-naming
+trigger: "When defining a new function or method in Java"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: OverCapi/Random-Block-Placement
+---
+
+# Random Block Placement Instinct Function Naming
+
+## Action
+
+Use camelCase for the function name
+
+## Evidence
+
+- Pattern in namingConventions.functions: camelCase
+
+---
+id: random-block-placement-instinct-constant-naming
+trigger: "When declaring a constant in Java"
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: OverCapi/Random-Block-Placement
+---
+
+# Random Block Placement Instinct Constant Naming
+
+## Action
+
+Use SCREAMING_SNAKE_CASE for the constant name
+
+## Evidence
+
+- Pattern in namingConventions.constants: SCREAMING_SNAKE_CASE
+
+---
+id: random-block-placement-instinct-import-style
+trigger: "When importing modules in Java"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: OverCapi/Random-Block-Placement
+---
+
+# Random Block Placement Instinct Import Style
+
+## Action
+
+Use relative import paths
+
+## Evidence
+
+- Pattern in importStyle: relative
+
+---
+id: random-block-placement-instinct-export-style
+trigger: "When exporting modules or classes in Java"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: OverCapi/Random-Block-Placement
+---
+
+# Random Block Placement Instinct Export Style
+
+## Action
+
+Use named exports
+
+## Evidence
+
+- Pattern in exportStyle: named
+
+---
+id: random-block-placement-instinct-commit-format
+trigger: "When writing a git commit message"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: OverCapi/Random-Block-Placement
+---
+
+# Random Block Placement Instinct Commit Format
+
+## Action
+
+Use the Conventional Commits format with a type prefix (e.g., refactor: ...)
+
+## Evidence
+
+- Pattern in commits.type: conventional
+- Pattern in commits.prefixes: ["refactor"]
+- Example: Refactor(Selection Screen Button): Add CustomButton widget class for Reset and Save button
+
+---
+id: random-block-placement-instinct-commit-length
+trigger: "When composing a git commit message"
+confidence: 0.7
+domain: git
+source: repo-analysis
+source_repo: OverCapi/Random-Block-Placement
+---
+
+# Random Block Placement Instinct Commit Length
+
+## Action
+
+Aim for a commit message length around 90 characters
+
+## Evidence
+
+- Pattern in commits.averageLength: 90
+
+---
+id: random-block-placement-instinct-test-location
+trigger: "When adding new test files"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: OverCapi/Random-Block-Placement
+---
+
+# Random Block Placement Instinct Test Location
+
+## Action
+
+Place test files in a separate directory from source code
+
+## Evidence
+
+- Pattern in architecture.folderStructure.testLocation: separate
+
