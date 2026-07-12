@@ -9,7 +9,7 @@ public class CustomButton {
 	private final int width;
 	private final int height;
 
-	private final Texture texture;
+	private Texture texture;
 	private final Runnable onClick;
 
 	public CustomButton(
@@ -40,7 +40,8 @@ public class CustomButton {
 	}
 
 
-	public boolean isClicked(double mx, double my) {
+
+	public boolean isHover(double mx, double my) {
 		return mx >= x
 				&& mx < x + width
 				&& my >= y
@@ -54,6 +55,9 @@ public class CustomButton {
 		}
 	}
 
+	public void setTexture(Texture texture) {
+		this.texture = texture;
+	}
 
 	public void render(GuiGraphicsExtractor extract) {
 		if (texture == null) {

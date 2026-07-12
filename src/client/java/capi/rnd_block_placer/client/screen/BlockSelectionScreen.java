@@ -111,23 +111,23 @@ public class BlockSelectionScreen extends Screen {
 		topPos = (height - DISPLAY_IMAGE_H) / 2;
 
 		resetButton = new CustomButton(
-				leftPos + 201, topPos + 28,
-				12, 12,
-//				new Texture(
-//						Identifier.fromNamespaceAndPath(RandomBlockPlacer.MOD_ID, "textures/gui/reset_button.png"),
-//						16,
-//						16
-//				),
+				leftPos + 200, topPos + 20,
+				20, 20,
+				new Texture(
+						Identifier.fromNamespaceAndPath(RandomBlockPlacer.MOD_ID, "textures/gui/reset_button_close.png"),
+						32,
+						32
+				),
 				this::reset
 		);
 		saveButton = new CustomButton(
-				leftPos + 201, topPos + 81,
-				12, 12,
-//				new Texture(
-//						Identifier.fromNamespaceAndPath(RandomBlockPlacer.MOD_ID, "textures/gui/save_button.png"),
-//						16,
-//						16
-//				),
+				leftPos + 200, topPos + 80,
+				20, 20,
+				new Texture(
+						Identifier.fromNamespaceAndPath(RandomBlockPlacer.MOD_ID, "textures/gui/save_button.png"),
+						32,
+						32
+				),
 				this::save
 		);
 
@@ -199,11 +199,11 @@ public class BlockSelectionScreen extends Screen {
 		double mx = event.x();
 		double my = event.y();
 
-		if (mx > 201 + leftPos && mx < 213 + leftPos && my > 81 + topPos && my < 93 + topPos) {
+		if (saveButton.isHover(mx, my)) {
 			player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 2f, 0.7f);
 			saveButton.onClick();
 			return super.mouseClicked(event, consumed);
-		} else if (resetButton.isClicked(mx, my)) {
+		} else if (resetButton.isHover(mx, my)) {
 			player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 2f, 0.7f);
 			resetButton.onClick();
 			return super.mouseClicked(event, consumed);
