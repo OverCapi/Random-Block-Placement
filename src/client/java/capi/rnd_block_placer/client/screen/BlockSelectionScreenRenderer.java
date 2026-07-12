@@ -9,7 +9,9 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,8 +103,7 @@ public class BlockSelectionScreenRenderer {
         for (Map.Entry<Identifier, Integer> entry : workingWeightSorted) {
             Identifier id = entry.getKey();
             int weight = entry.getValue();
-            ItemStack st = findStackFor(id, player);
-            if (st == null) continue;
+            ItemStack st = new ItemStack(BuiltInRegistries.ITEM.getValue(id), 1);
 
             shown++;
             // Show "+ N more" line if list exceeds available space
@@ -113,7 +114,6 @@ public class BlockSelectionScreenRenderer {
             }
 
             int realWeight = weight * 100 / totalWeight;
-
             Component component = Component.literal(
               String.format("%d%% (%d)",  realWeight, weight)
             );
