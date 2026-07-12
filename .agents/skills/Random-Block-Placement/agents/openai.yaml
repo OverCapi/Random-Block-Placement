@@ -1,0 +1,6 @@
+interface:
+  display_name: "Random Block Placement"
+  short_description: "Repo-specific patterns and workflows for Random-Block-Placement"
+  default_prompt: "Use the Random-Block-Placement repo skill to follow existing architecture, testing, and workflow conventions."
+policy:
+  allow_implicit_invocation: true
