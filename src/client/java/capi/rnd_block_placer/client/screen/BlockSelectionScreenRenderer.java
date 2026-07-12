@@ -28,6 +28,7 @@ public class BlockSelectionScreenRenderer {
 
     private Minecraft mc;
 
+    private BlockSelectionScreen selectionScreen = null;
     private BlockSelectionScreenState currentState = null;
 
     // Initializes positioning and rendering references
@@ -36,6 +37,10 @@ public class BlockSelectionScreenRenderer {
         this.topPos = topPos;
         this.font = font;
         this.mc = mc;
+    }
+
+    public void setSelectionScreen(BlockSelectionScreen selectionScreen) {
+        this.selectionScreen = selectionScreen;
     }
 
     // Sets the current screen state to render
@@ -184,8 +189,9 @@ public class BlockSelectionScreenRenderer {
         if (currentState == null) {
             return;
         }
-
         drawBackground(extract);
+        selectionScreen.getSaveButton().render(extract);
+        selectionScreen.getResetButton().render(extract);
         drawSelectedList(extract);
         drawInventorySlots(extract, mx, my);
     }

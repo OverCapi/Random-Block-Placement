@@ -1,8 +1,12 @@
 package capi.rnd_block_placer.client.screen;
 
+import capi.rnd_block_placer.RandomBlockPlacer;
 import capi.rnd_block_placer.client.blockPlacer.BlockPlacer;
 import capi.rnd_block_placer.client.config.BlockPlacerConfig;
 
+import capi.rnd_block_placer.client.screen.widget.CustomButton;
+import capi.rnd_block_placer.client.screen.widget.Texture;
+import net.minecraft.client.color.item.CustomModelDataSource;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -24,12 +28,15 @@ import static capi.rnd_block_placer.client.screen.BlockSelectionScreenConstant.*
 // GUI screen for selecting blocks and configuring their weights for random placement
 public class BlockSelectionScreen extends Screen {
 	// State and renderer separated for cleaner architecture
-	private BlockSelectionScreenState blockSelectionScreenState = new BlockSelectionScreenState();
-	private BlockSelectionScreenRenderer blockSelectionScreenRenderer = new BlockSelectionScreenRenderer();
+	private final BlockSelectionScreenState blockSelectionScreenState = new BlockSelectionScreenState();
+	private final BlockSelectionScreenRenderer blockSelectionScreenRenderer = new BlockSelectionScreenRenderer();
 
 	// Container position (centered on screen)
 	private int leftPos;
 	private int topPos;
+
+	private CustomButton resetButton;
+	private CustomButton saveButton;
 
 	// Weight editing UI components (TODO: extract into dedicated editor component)
 	private EditBox weightInput;
@@ -39,6 +46,14 @@ public class BlockSelectionScreen extends Screen {
 
 	public BlockSelectionScreen() {
 		super(Component.literal("Random Block Placer"));
+	}
+
+	public CustomButton getSaveButton() {
+		return saveButton;
+	}
+
+	public CustomButton getResetButton() {
+		return resetButton;
 	}
 
 	// Persists the working state to config and closes the screen
@@ -95,6 +110,27 @@ public class BlockSelectionScreen extends Screen {
 		leftPos = (width - DISPLAY_IMAGE_W) / 2;
 		topPos = (height - DISPLAY_IMAGE_H) / 2;
 
+		resetButton = new CustomButton(
+				leftPos + 201, topPos + 28,
+				12, 12,
+//				new Texture(
+//						Identifier.fromNamespaceAndPath(RandomBlockPlacer.MOD_ID, "textures/gui/reset_button.png"),
+//						16,
+//						16
+//				),
+				this::reset
+		);
+		saveButton = new CustomButton(
+				leftPos + 201, topPos + 81,
+				12, 12,
+//				new Texture(
+//						Identifier.fromNamespaceAndPath(RandomBlockPlacer.MOD_ID, "textures/gui/save_button.png"),
+//						16,
+//						16
+//				),
+				this::save
+		);
+
 		initWeightInput();
 
 		// Initialize the custom renderer
@@ -111,6 +147,7 @@ public class BlockSelectionScreen extends Screen {
 	public void extractRenderState(GuiGraphicsExtractor extract, int mx, int my, float delta) {
 		super.extractRenderState(extract, mx, my, delta);
 		// Delegate rendering to the dedicated renderer
+		blockSelectionScreenRenderer.setSelectionScreen(this);
 		blockSelectionScreenRenderer.setCurrentState(blockSelectionScreenState);
 		blockSelectionScreenRenderer.render(extract, mx, my, delta);
 
@@ -164,11 +201,11 @@ public class BlockSelectionScreen extends Screen {
 
 		if (mx > 201 + leftPos && mx < 213 + leftPos && my > 81 + topPos && my < 93 + topPos) {
 			player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 2f, 0.7f);
-			this.save();
+			saveButton.onClick();
 			return super.mouseClicked(event, consumed);
-		} else if (mx > 201 + leftPos && mx < 213 + leftPos && my > 28 + topPos && my < 40 + topPos) {
+		} else if (resetButton.isClicked(mx, my)) {
 			player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 2f, 0.7f);
-			this.reset();
+			resetButton.onClick();
 			return super.mouseClicked(event, consumed);
 		}
 
