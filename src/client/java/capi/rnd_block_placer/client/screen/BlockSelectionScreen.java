@@ -113,21 +113,13 @@ public class BlockSelectionScreen extends Screen {
 		resetButton = new CustomButton(
 				leftPos + 200, topPos + 20,
 				20, 20,
-				new Texture(
-						Identifier.fromNamespaceAndPath(RandomBlockPlacer.MOD_ID, "textures/gui/reset_button_close.png"),
-						32,
-						32
-				),
+				RESET_BUTTON_CLOSE,
 				this::reset
 		);
 		saveButton = new CustomButton(
 				leftPos + 200, topPos + 80,
 				20, 20,
-				new Texture(
-						Identifier.fromNamespaceAndPath(RandomBlockPlacer.MOD_ID, "textures/gui/save_button.png"),
-						32,
-						32
-				),
+				SAVE_BUTTON,
 				this::save
 		);
 
@@ -146,6 +138,14 @@ public class BlockSelectionScreen extends Screen {
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor extract, int mx, int my, float delta) {
 		super.extractRenderState(extract, mx, my, delta);
+
+		// Change texture of the reset button if isHover
+		if (resetButton.isHover(mx, my)) {
+			resetButton.setTexture(RESET_BUTTON_OPEN);
+		} else {
+			resetButton.setTexture(RESET_BUTTON_CLOSE);
+		}
+
 		// Delegate rendering to the dedicated renderer
 		blockSelectionScreenRenderer.setSelectionScreen(this);
 		blockSelectionScreenRenderer.setCurrentState(blockSelectionScreenState);
@@ -183,6 +183,9 @@ public class BlockSelectionScreen extends Screen {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean consumed) {
+		double mx = event.x();
+		double my = event.y();
+
 		if (consumed) {
 			return super.mouseClicked(event, consumed);
 		}
@@ -195,9 +198,6 @@ public class BlockSelectionScreen extends Screen {
 		if (player == null) {
 			return super.mouseClicked(event, consumed);
 		}
-
-		double mx = event.x();
-		double my = event.y();
 
 		if (saveButton.isHover(mx, my)) {
 			player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 2f, 0.7f);

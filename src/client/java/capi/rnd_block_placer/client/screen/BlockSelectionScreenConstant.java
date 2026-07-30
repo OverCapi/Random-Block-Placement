@@ -1,6 +1,7 @@
 package capi.rnd_block_placer.client.screen;
 
 import capi.rnd_block_placer.RandomBlockPlacer;
+import capi.rnd_block_placer.client.screen.widget.Texture;
 import net.minecraft.resources.Identifier;
 
 // Constants for the block selection screen layout, textures, and colors
@@ -23,6 +24,27 @@ public class BlockSelectionScreenConstant {
     // Inventory grid: 4 rows (3 main + 1 hotbar) x 9 columns
     public static final int INVENTORY_ROW = 4;
     public static final int INVENTORY_COL = 9;
+
+
+    // Trash Button Texture
+    public static final Texture RESET_BUTTON_CLOSE = new Texture(
+            Identifier.fromNamespaceAndPath(RandomBlockPlacer.MOD_ID, "textures/gui/reset_button_close.png"),
+            32,
+            32
+    );
+    public static final Texture RESET_BUTTON_OPEN = new Texture(
+            Identifier.fromNamespaceAndPath(RandomBlockPlacer.MOD_ID, "textures/gui/reset_button_open.png"),
+            32,
+            32
+    );
+
+    // Save Button Texture
+    public static final Texture SAVE_BUTTON = new Texture(
+            Identifier.fromNamespaceAndPath(RandomBlockPlacer.MOD_ID, "textures/gui/save_button.png"),
+            32,
+            32
+    );
+
 
     // Slot size and positioning within the container
     public static final int SLOT_SIZE = 14;
