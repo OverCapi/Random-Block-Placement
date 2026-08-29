@@ -180,9 +180,25 @@ public class BlockSelectionScreenRenderer {
                 boolean hovered = mx >= x && mx < x + SLOT_SIZE && my >= y && my < y + SLOT_SIZE;
                 if (hovered) {
                     extract.fill(x, y, x + SLOT_SIZE, y + SLOT_SIZE, HOVER);
+                    if (!itemStack.isEmpty()) {
+                        drawHoverName(extract, itemStack, x, y);
+                    }
                 }
             }
         }
+    }
+
+    // Draws the item name above the hovered slot, without a background
+    private void drawHoverName(GuiGraphicsExtractor extract, ItemStack itemStack, int slotX, int slotY) {
+        String name = itemStack.getHoverName().getString();
+        int nameWidth = font.width(name);
+        int textX = Math.max(0, Math.min(slotX + (SLOT_SIZE - nameWidth) / 2,
+                mc.getWindow().getGuiScaledWidth() - nameWidth));
+        int textY = slotY - font.lineHeight - 1;
+        if (textY < 0) {
+            textY = slotY + SLOT_SIZE + 1;
+        }
+        extract.text(font, name, textX, textY, 0xFFFFFFFF);
     }
 
     // Main render method: draws background, buttons, selected list, and inventory slots
