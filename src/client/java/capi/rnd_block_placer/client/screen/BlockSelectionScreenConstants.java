@@ -57,6 +57,7 @@ public class BlockSelectionScreenConstants {
     public static final int SELECTED_PANEL_BOTTOM_MARGIN = 10;
     public static final int SELECTED_PANEL_ITEM_X_OFFSET = 18;
     public static final int SELECTED_PANEL_TEXT_Y_OFFSET = 4;
+    public static final int SELECTED_PANEL_MAX_WIDTH = 120;
 
     // Selected blocks panel text colors
     public static final int SELECTED_PANEL_HEADER_COLOR = 0xFFCCCCCC;
@@ -66,6 +67,31 @@ public class BlockSelectionScreenConstants {
     // Weight editor positioning (relative to the container)
     public static final int WEIGHT_INPUT_Y_OFFSET = 4;
     public static final int WEIGHT_LABEL_Y_OFFSET = 14;
+
+    // Preset panel positioning (to the right of the container)
+    public static final int PRESET_PANEL_X_OFFSET = 236;
+    public static final int PRESET_PANEL_Y_OFFSET = 20;
+    public static final int PRESET_HEADER_COLOR = 0xFFCCCCCC;
+    public static final int PRESET_ACTIVE_COLOR = 0xFF00CC00;
+    public static final int PRESET_TEXT_COLOR = 0xFFFFFFFF;
+    public static final int PRESET_ACTIVE_Y_OFFSET = 16;
+    public static final int PRESET_ROW_START_Y_OFFSET = 30;
+    public static final int PRESET_ROW_HEIGHT = 18;
+    public static final int PRESET_MAX_ROWS = 4;
+    public static final int PRESET_NAME_MAX_WIDTH = 88;
+    public static final int PRESET_BUTTON_WIDTH = 44;
+    public static final int PRESET_BUTTON_HEIGHT = 12;
+    public static final int PRESET_BUTTON_SPACING = 4;
+    public static final int PRESET_CREATE_BUTTON_WIDTH = 44;
+    public static final int PRESET_CREATE_BUTTON_HEIGHT = 14;
+    public static final int PRESET_NAME_INPUT_WIDTH = 90;
+    public static final int PRESET_NAME_INPUT_HEIGHT = 14;
+    public static final int PRESET_NAME_MAX_LENGTH = 20;
+    public static final int PRESET_BUTTON_ROW_SPACING = 8;
+    public static final int PRESET_MESSAGE_COLOR = 0xFFFF5555;
+    // Preset name input and buttons (centered below the container)
+    public static final int PRESET_BOTTOM_Y_OFFSET = 14;
+    public static final int PRESET_SAVE_BUTTON_WIDTH = 150;
 
     // Button click sound
     public static final float BUTTON_SOUND_VOLUME = 2.0f;

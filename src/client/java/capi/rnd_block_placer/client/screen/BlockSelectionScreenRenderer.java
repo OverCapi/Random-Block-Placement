@@ -26,12 +26,25 @@ public class BlockSelectionScreenRenderer {
 
     private Minecraft mc;
 
+    // Scroll offset for the selected blocks list (left panel)
+    private int selectedListScrollOffset = 0;
+
     // Initializes positioning and rendering references
     public void init(int leftPos, int topPos, Font font, Minecraft mc) {
         this.leftPos = leftPos;
         this.topPos = topPos;
         this.font = font;
         this.mc = mc;
+        selectedListScrollOffset = 0;
+    }
+
+    // Scrolls the selected blocks list when the mouse wheel is used over the left panel
+    public boolean mouseScrolled(double mx, double my, double verticalAmount, BlockSelectionScreenState state) {
+        if (!isOverSelectedListArea(mx, my) || maxSelectedListScrollOffset(state) == 0) {
+            return false;
+        }
+        selectedListScrollOffset = Math.max(0, Math.min(maxSelectedListScrollOffset(state), selectedListScrollOffset - (int) verticalAmount));
+        return true;
     }
 
     // Draws the vanilla inventory container background
@@ -72,23 +85,14 @@ public class BlockSelectionScreenRenderer {
 
         List<Map.Entry<Identifier, Integer>> workingWeightSorted = state.weightsSortedByDesc();
 
-        int maxY = topPos + DISPLAY_IMAGE_H - SELECTED_PANEL_BOTTOM_MARGIN;
+        int maxRows = maxSelectedRows();
+        int start = Math.min(selectedListScrollOffset, maxSelectedListScrollOffset(state));
         int yOff = panelY;
-        int shown = 0;
-        int maxRows = (maxY - panelY) / SELECTED_PANEL_ROW_HEIGHT;
-
-        for (Map.Entry<Identifier, Integer> entry : workingWeightSorted) {
+        for (int i = start; i < workingWeightSorted.size() && i < start + maxRows; i++) {
+            Map.Entry<Identifier, Integer> entry = workingWeightSorted.get(i);
             Identifier id = entry.getKey();
             int weight = entry.getValue();
             ItemStack st = new ItemStack(BuiltInRegistries.ITEM.getValue(id), 1);
-
-            shown++;
-            // Show "+ N more" line if list exceeds available space
-            if (shown > maxRows) {
-                int rem = workingWeightSorted.size() - shown + 1;
-                extract.text(font, Component.translatable("label.rnd-block-placer.more", rem), panelX, yOff, SELECTED_PANEL_MORE_COLOR);
-                break;
-            }
 
             int realWeight = weight * 100 / totalWeight;
             Component component = Component.translatable("label.rnd-block-placer.weight_summary", realWeight, weight);
@@ -99,6 +103,35 @@ public class BlockSelectionScreenRenderer {
             extract.text(font, component, x + SELECTED_PANEL_ITEM_X_OFFSET, yOff + SELECTED_PANEL_TEXT_Y_OFFSET, SELECTED_PANEL_TEXT_COLOR);
             yOff += SELECTED_PANEL_ROW_HEIGHT;
         }
+
+        // Hint that the list can be scrolled when it exceeds the visible area
+        if (workingWeightSorted.size() > maxRows) {
+            int remaining = workingWeightSorted.size() - maxRows;
+            extract.text(font, Component.translatable("label.rnd-block-placer.more_scroll", remaining),
+                    panelX, yOff, SELECTED_PANEL_MORE_COLOR);
+        }
+    }
+
+    // Maximum number of selected list rows that fit in the panel
+    private int maxSelectedRows() {
+        int maxY = topPos + DISPLAY_IMAGE_H - SELECTED_PANEL_BOTTOM_MARGIN;
+        int panelY = topPos + SELECTED_PANEL_Y_OFFSET;
+        return (maxY - panelY) / SELECTED_PANEL_ROW_HEIGHT;
+    }
+
+    // Maximum scroll offset for the selected list (0 when it fits entirely)
+    private int maxSelectedListScrollOffset(BlockSelectionScreenState state) {
+        return Math.max(0, state.weightsSortedByDesc().size() - maxSelectedRows());
+    }
+
+    // Whether the cursor is over the selected blocks list area
+    private boolean isOverSelectedListArea(double mx, double my) {
+        int panelX = Math.max(leftPos - SELECTED_PANEL_X_OFFSET, 0);
+        int panelY = topPos + SELECTED_PANEL_Y_OFFSET;
+        return mx >= panelX
+                && mx < panelX + SELECTED_PANEL_MAX_WIDTH
+                && my >= panelY
+                && my < panelY + maxSelectedRows() * SELECTED_PANEL_ROW_HEIGHT;
     }
 
     // Renders all inventory slots with selection highlights, non-block overlays, and hover effects

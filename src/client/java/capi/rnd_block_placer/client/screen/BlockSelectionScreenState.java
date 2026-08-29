@@ -63,6 +63,12 @@ public class BlockSelectionScreenState {
         workingWeights.remove(id);
     }
 
+    // Replaces the entire working selection with a new map (used when loading a preset)
+    public void setWeights(Map<Identifier, Integer> weights) {
+        workingWeights.clear();
+        workingWeights.putAll(weights);
+    }
+
     // Returns the sum of all working weights
     public int totalWeight() {
         int total = 0;

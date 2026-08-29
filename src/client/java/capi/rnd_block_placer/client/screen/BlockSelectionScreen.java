@@ -23,6 +23,7 @@ public class BlockSelectionScreen extends Screen {
     private final BlockSelectionScreenRenderer blockSelectionScreenRenderer = new BlockSelectionScreenRenderer();
 
     private WeightEditor weightEditor;
+    private PresetPanel presetPanel;
 
     // Container position (centered on screen)
     private int leftPos;
@@ -88,6 +89,9 @@ public class BlockSelectionScreen extends Screen {
         );
         addRenderableWidget(weightEditor.getInput());
 
+        presetPanel = new PresetPanel(font, minecraft, blockSelectionScreenState, leftPos, topPos);
+        addRenderableWidget(presetPanel.getInput());
+
         // Initialize the custom renderer
         blockSelectionScreenRenderer.init(leftPos, topPos, font, minecraft);
     }
@@ -104,6 +108,9 @@ public class BlockSelectionScreen extends Screen {
 
         // Draw the weight label when editing is active
         weightEditor.render(extract, leftPos, topPos);
+
+        // Draw the preset management panel
+        presetPanel.render(extract, mx, my);
     }
 
     @Override
@@ -131,6 +138,11 @@ public class BlockSelectionScreen extends Screen {
         } else if (resetButton.isHover(mx, my)) {
             player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), BUTTON_SOUND_VOLUME, BUTTON_SOUND_PITCH);
             resetButton.onClick();
+            return super.mouseClicked(event, consumed);
+        }
+
+        // Delegate clicks on the preset panel to it
+        if (presetPanel.mouseClicked(mx, my)) {
             return super.mouseClicked(event, consumed);
         }
 
@@ -178,10 +190,22 @@ public class BlockSelectionScreen extends Screen {
 
     @Override
     public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        // Handle Enter (create preset) in the name input
+        if (presetPanel.keyPressed(event)) {
+            return true;
+        }
         // Handle Enter (confirm) and Escape (cancel) when weight editor is open
         if (weightEditor.handleKey(event)) {
             return true;
         }
         return super.keyPressed(event);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (presetPanel.mouseScrolled(mouseX, mouseY, verticalAmount)) {
+            return true;
+        }
+        return blockSelectionScreenRenderer.mouseScrolled(mouseX, mouseY, verticalAmount, blockSelectionScreenState);
     }
 }
