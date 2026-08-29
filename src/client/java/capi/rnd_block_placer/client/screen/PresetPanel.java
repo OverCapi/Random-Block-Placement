@@ -131,14 +131,13 @@ public class PresetPanel {
 
     // Draws the preset header, scrolled list, bottom section, and any transient message
     public void render(GuiGraphicsExtractor extract, int mx, int my) {
-        int panelY = topPos + PRESET_PANEL_Y_OFFSET;
-
-        extract.text(font, Component.translatable("label.rnd-block-placer.presets"), panelX(), panelY, PRESET_HEADER_COLOR);
+        extract.text(font, Component.translatable("label.rnd-block-placer.presets"),
+                panelX(), topPos + PANEL_HEADER_Y_OFFSET, PRESET_HEADER_COLOR);
 
         String active = BlockPlacerConfig.INSTANCE.getActivePreset();
         if (active != null) {
             extract.text(font, Component.translatable("label.rnd-block-placer.preset.active", active),
-                    panelX(), panelY + PRESET_ACTIVE_Y_OFFSET, PRESET_ACTIVE_COLOR);
+                    panelX(), topPos + PANEL_ACTIVE_LABEL_Y_OFFSET, PRESET_ACTIVE_COLOR);
         }
 
         renderRows(extract);
@@ -228,7 +227,7 @@ public class PresetPanel {
                 handleDelete(name);
                 return true;
             }
-            y += PRESET_ROW_HEIGHT;
+            y += PANEL_ROW_HEIGHT;
         }
         return false;
     }
@@ -249,14 +248,14 @@ public class PresetPanel {
                     ? Component.translatable("button.rnd-block-placer.preset.confirm").withColor(0xFF800700)
                     : Component.translatable("button.rnd-block-placer.preset.delete").withColor(0xFF800700);
             renderCenteredLabel(extract, deleteLabel, deleteButtonX(), y, PRESET_BUTTON_WIDTH, PRESET_BUTTON_HEIGHT);
-            y += PRESET_ROW_HEIGHT;
+            y += PANEL_ROW_HEIGHT;
         }
 
         // Hint that the list can be scrolled when it exceeds the visible area
         if (names.size() > PRESET_MAX_ROWS) {
             int remaining = names.size() - PRESET_MAX_ROWS;
             extract.text(font, Component.translatable("label.rnd-block-placer.preset.more", remaining),
-                    panelX(), rowsStartY() + PRESET_MAX_ROWS * PRESET_ROW_HEIGHT, SELECTED_PANEL_MORE_COLOR);
+                    panelX(), rowsStartY() + PRESET_MAX_ROWS * PANEL_ROW_HEIGHT, SELECTED_PANEL_MORE_COLOR);
         }
     }
 
@@ -303,7 +302,7 @@ public class PresetPanel {
         if (boxX < 4) {
             boxX = 4;
         }
-        int rowY = rowsStartY() + (int) ((my - rowsStartY()) / PRESET_ROW_HEIGHT) * PRESET_ROW_HEIGHT;
+        int rowY = rowsStartY() + (int) ((my - rowsStartY()) / PANEL_ROW_HEIGHT) * PANEL_ROW_HEIGHT;
         int maxY = mc.getWindow().getGuiScaledHeight() - boxHeight - 4;
         int boxY = Math.max(4, Math.min(maxY, rowY));
 
@@ -325,7 +324,7 @@ public class PresetPanel {
         if (mx < panelX() || mx > deleteButtonX() + PRESET_BUTTON_WIDTH || my < rowsStartY()) {
             return null;
         }
-        int row = (int) ((my - rowsStartY()) / PRESET_ROW_HEIGHT);
+        int row = (int) ((my - rowsStartY()) / PANEL_ROW_HEIGHT);
         if (row < 0 || row >= PRESET_MAX_ROWS) {
             return null;
         }
@@ -388,7 +387,7 @@ public class PresetPanel {
         return mx >= panelX()
                 && mx < deleteButtonX() + PRESET_BUTTON_WIDTH
                 && my >= rowsStartY()
-                && my < rowsStartY() + PRESET_MAX_ROWS * PRESET_ROW_HEIGHT;
+                && my < rowsStartY() + PRESET_MAX_ROWS * PANEL_ROW_HEIGHT;
     }
 
     private int panelX() {
@@ -396,7 +395,7 @@ public class PresetPanel {
     }
 
     private int rowsStartY() {
-        return topPos + PRESET_PANEL_Y_OFFSET + PRESET_ROW_START_Y_OFFSET;
+        return topPos + PANEL_ROW_START_Y_OFFSET;
     }
 
     private int selectButtonX() {
@@ -413,7 +412,7 @@ public class PresetPanel {
     }
 
     private int buttonAlignY() {
-        return (PRESET_ROW_HEIGHT - font.lineHeight) / 2;
+        return (PANEL_ROW_HEIGHT - font.lineHeight) / 2;
     }
 
     private void showMessage(Component newMessage) {

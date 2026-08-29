@@ -80,10 +80,11 @@ public class BlockSelectionScreenRenderer {
             return;
         }
 
-        int panelX = leftPos - SELECTED_PANEL_X_OFFSET;
-        int panelY = topPos + SELECTED_PANEL_Y_OFFSET;
+        // Single left margin for the whole panel, clamped to keep content on-screen
+        int panelX = Math.max(leftPos - SELECTED_PANEL_X_OFFSET, 0);
+        int panelY = topPos + PANEL_ROW_START_Y_OFFSET;
 
-        extract.text(font, Component.translatable("label.rnd-block-placer.selected"), panelX, panelY - SELECTED_PANEL_HEADER_Y_OFFSET, SELECTED_PANEL_HEADER_COLOR);
+        extract.text(font, Component.translatable("label.rnd-block-placer.selected"), panelX, topPos + PANEL_HEADER_Y_OFFSET, SELECTED_PANEL_HEADER_COLOR);
 
         // Calculate total weight for percentage display
         int totalWeight = state.totalWeight();
@@ -103,10 +104,9 @@ public class BlockSelectionScreenRenderer {
             Component component = Component.translatable("label.rnd-block-placer.weight_summary", realWeight, weight);
 
             // Render item icon and percentage
-            int x = Math.max(panelX, 0);
-            extract.item(st, x, yOff);
-            extract.text(font, component, x + SELECTED_PANEL_ITEM_X_OFFSET, yOff + SELECTED_PANEL_TEXT_Y_OFFSET, SELECTED_PANEL_TEXT_COLOR);
-            yOff += SELECTED_PANEL_ROW_HEIGHT;
+            extract.item(st, panelX, yOff);
+            extract.text(font, component, panelX + SELECTED_PANEL_ITEM_X_OFFSET, yOff + SELECTED_PANEL_TEXT_Y_OFFSET, SELECTED_PANEL_TEXT_COLOR);
+            yOff += PANEL_ROW_HEIGHT;
         }
 
         // Hint that the list can be scrolled when it exceeds the visible area
@@ -120,8 +120,8 @@ public class BlockSelectionScreenRenderer {
     // Maximum number of selected list rows that fit in the panel
     private int maxSelectedRows() {
         int maxY = topPos + DISPLAY_IMAGE_H - SELECTED_PANEL_BOTTOM_MARGIN;
-        int panelY = topPos + SELECTED_PANEL_Y_OFFSET;
-        return (maxY - panelY) / SELECTED_PANEL_ROW_HEIGHT;
+        int panelY = topPos + PANEL_ROW_START_Y_OFFSET;
+        return (maxY - panelY) / PANEL_ROW_HEIGHT;
     }
 
     // Maximum scroll offset for the selected list (0 when it fits entirely)
@@ -132,11 +132,11 @@ public class BlockSelectionScreenRenderer {
     // Whether the cursor is over the selected blocks list area
     private boolean isOverSelectedListArea(double mx, double my) {
         int panelX = Math.max(leftPos - SELECTED_PANEL_X_OFFSET, 0);
-        int panelY = topPos + SELECTED_PANEL_Y_OFFSET;
+        int panelY = topPos + PANEL_ROW_START_Y_OFFSET;
         return mx >= panelX
                 && mx < panelX + SELECTED_PANEL_MAX_WIDTH
                 && my >= panelY
-                && my < panelY + maxSelectedRows() * SELECTED_PANEL_ROW_HEIGHT;
+                && my < panelY + maxSelectedRows() * PANEL_ROW_HEIGHT;
     }
 
     // Draws the enlarged item icon centered on its slot, via pose scaling about the slot center

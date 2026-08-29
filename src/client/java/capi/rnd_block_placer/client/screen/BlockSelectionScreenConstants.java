@@ -49,11 +49,16 @@ public class BlockSelectionScreenConstants {
     public static final int MAIN_Y = 10;
     public static final int HOTBAR_Y = 116;
 
+    // Shared side-panel vertical layout (offsets from the container top) so the two
+    // lists line up row for row: identical header, label, row positions and heights
+    public static final int PANEL_HEADER_Y_OFFSET = 2;
+    public static final int PANEL_ACTIVE_LABEL_Y_OFFSET = 12;
+    public static final int PANEL_ROW_START_Y_OFFSET = 24;
+    public static final int PANEL_ROW_HEIGHT = 20;
+    public static final int PANEL_VISIBLE_ROWS = 6;
+
     // Selected blocks panel positioning (relative to the container)
     public static final int SELECTED_PANEL_X_OFFSET = 115;
-    public static final int SELECTED_PANEL_Y_OFFSET = 20;
-    public static final int SELECTED_PANEL_HEADER_Y_OFFSET = 14;
-    public static final int SELECTED_PANEL_ROW_HEIGHT = 20;
     public static final int SELECTED_PANEL_BOTTOM_MARGIN = 10;
     public static final int SELECTED_PANEL_ITEM_X_OFFSET = 18;
     public static final int SELECTED_PANEL_TEXT_Y_OFFSET = 4;
@@ -70,14 +75,10 @@ public class BlockSelectionScreenConstants {
 
     // Preset panel positioning (to the right of the container)
     public static final int PRESET_PANEL_X_OFFSET = 336;
-    public static final int PRESET_PANEL_Y_OFFSET = 20;
     public static final int PRESET_HEADER_COLOR = 0xFFCCCCCC;
     public static final int PRESET_ACTIVE_COLOR = 0xFF00CC00;
     public static final int PRESET_TEXT_COLOR = 0xFFFFFFFF;
-    public static final int PRESET_ACTIVE_Y_OFFSET = 16;
-    public static final int PRESET_ROW_START_Y_OFFSET = 30;
-    public static final int PRESET_ROW_HEIGHT = 18;
-    public static final int PRESET_MAX_ROWS = 4;
+    public static final int PRESET_MAX_ROWS = PANEL_VISIBLE_ROWS;
     public static final int PRESET_NAME_MAX_WIDTH = 88;
     public static final int PRESET_BUTTON_WIDTH = 44;
     public static final int PRESET_BUTTON_HEIGHT = 12;
