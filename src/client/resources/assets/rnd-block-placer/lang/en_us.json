@@ -2,5 +2,13 @@
 	"key.category.rnd-block-placer.rnd-block-placement": "Random Block Placement",
 	"key.rnd-block-placer.toggle_selection_screen": "Toggle block selection screen",
 	"key.rnd-block-placer.toggle_block_placement": "Toggle block placement",
-	"category.rnd-block-placer": "Random Block Placement"
+	"category.rnd-block-placer": "Random Block Placement",
+	"screen.rnd-block-placer.title": "Random Block Placer",
+	"button.rnd-block-placer.weight": "Weight",
+	"label.rnd-block-placer.weight_for": "§7Weights for %s:",
+	"label.rnd-block-placer.selected": "§lSelected:",
+	"label.rnd-block-placer.weight_summary": "%d%% (%d)",
+	"label.rnd-block-placer.more": "§7+ %s more",
+	"hud.rnd-block-placer.enabled": "§aENABLE",
+	"message.rnd-block-placer.missing_materials": "§c[RBP] Missing materials : §e%s"
 }

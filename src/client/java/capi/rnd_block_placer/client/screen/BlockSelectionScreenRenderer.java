@@ -1,5 +1,6 @@
 package capi.rnd_block_placer.client.screen;
 
+import capi.rnd_block_placer.client.screen.widget.CustomButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -9,15 +10,12 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ItemLike;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static capi.rnd_block_placer.client.screen.BlockSelectionScreenConstant.*;
+import static capi.rnd_block_placer.client.screen.BlockSelectionScreenConstants.*;
 
 // Handles all custom rendering for the block selection screen
 public class BlockSelectionScreenRenderer {
@@ -28,24 +26,12 @@ public class BlockSelectionScreenRenderer {
 
     private Minecraft mc;
 
-    private BlockSelectionScreen selectionScreen = null;
-    private BlockSelectionScreenState currentState = null;
-
     // Initializes positioning and rendering references
     public void init(int leftPos, int topPos, Font font, Minecraft mc) {
         this.leftPos = leftPos;
         this.topPos = topPos;
         this.font = font;
         this.mc = mc;
-    }
-
-    public void setSelectionScreen(BlockSelectionScreen selectionScreen) {
-        this.selectionScreen = selectionScreen;
-    }
-
-    // Sets the current screen state to render
-    public void setCurrentState(BlockSelectionScreenState currentState) {
-        this.currentState = currentState;
     }
 
     // Draws the vanilla inventory container background
@@ -66,21 +52,9 @@ public class BlockSelectionScreenRenderer {
         );
     }
 
-    // Searches the player's inventory (first 36 slots) for a stack matching the given block ID
-    private ItemStack findStackFor(Identifier id, LocalPlayer p) {
-        for (int i = 0; i < 36; i++) {
-            ItemStack st = p.getInventory().getItem(i);
-            if (st.getItem() instanceof BlockItem
-                    && BuiltInRegistries.ITEM.getKey(st.getItem()).equals(id)) {
-                return st;
-            }
-        }
-        return null;
-    }
-
     // Draws the selected blocks panel on the left side with their weight percentages
-    private void drawSelectedList(GuiGraphicsExtractor extract) {
-        if (currentState.getWorkingWeights().isEmpty()) {
+    private void drawSelectedList(GuiGraphicsExtractor extract, BlockSelectionScreenState state) {
+        if (state.isEmpty()) {
             return;
         }
         LocalPlayer player = mc.player;
@@ -88,22 +62,20 @@ public class BlockSelectionScreenRenderer {
             return;
         }
 
-        int panelX = leftPos - 115;
-        int panelY = topPos + 40;
+        int panelX = leftPos - SELECTED_PANEL_X_OFFSET;
+        int panelY = topPos + SELECTED_PANEL_Y_OFFSET;
 
-        extract.text(font, "§lSelected:", panelX, panelY - 14, 0xFFCCCCCC);
+        extract.text(font, Component.translatable("label.rnd-block-placer.selected"), panelX, panelY - SELECTED_PANEL_HEADER_Y_OFFSET, SELECTED_PANEL_HEADER_COLOR);
 
         // Calculate total weight for percentage display
-        int totalWeight = currentState.getWorkingWeights().values().stream().mapToInt(Integer::intValue).sum();
+        int totalWeight = state.totalWeight();
 
-        // Sort entries by weight descending
-        List<Map.Entry<Identifier, Integer>> workingWeightSorted = new ArrayList<>(currentState.getWorkingWeights().entrySet());
-        workingWeightSorted.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+        List<Map.Entry<Identifier, Integer>> workingWeightSorted = state.weightsSortedByDesc();
 
-        int maxY = topPos + DISPLAY_IMAGE_H - 10;
+        int maxY = topPos + DISPLAY_IMAGE_H - SELECTED_PANEL_BOTTOM_MARGIN;
         int yOff = panelY;
         int shown = 0;
-        int maxRows = (maxY - panelY) / 20;
+        int maxRows = (maxY - panelY) / SELECTED_PANEL_ROW_HEIGHT;
 
         for (Map.Entry<Identifier, Integer> entry : workingWeightSorted) {
             Identifier id = entry.getKey();
@@ -114,25 +86,23 @@ public class BlockSelectionScreenRenderer {
             // Show "+ N more" line if list exceeds available space
             if (shown > maxRows) {
                 int rem = workingWeightSorted.size() - shown + 1;
-                extract.text(font, "§7+ " + rem + " more", panelX, yOff, 0xFF888888);
+                extract.text(font, Component.translatable("label.rnd-block-placer.more", rem), panelX, yOff, SELECTED_PANEL_MORE_COLOR);
                 break;
             }
 
             int realWeight = weight * 100 / totalWeight;
-            Component component = Component.literal(
-              String.format("%d%% (%d)",  realWeight, weight)
-            );
+            Component component = Component.translatable("label.rnd-block-placer.weight_summary", realWeight, weight);
 
             // Render item icon and percentage
             int x = Math.max(panelX, 0);
             extract.item(st, x, yOff);
-            extract.text(font, component, x + 18, yOff + 4, 0xFFFFFFFF);
-            yOff += 20;
+            extract.text(font, component, x + SELECTED_PANEL_ITEM_X_OFFSET, yOff + SELECTED_PANEL_TEXT_Y_OFFSET, SELECTED_PANEL_TEXT_COLOR);
+            yOff += SELECTED_PANEL_ROW_HEIGHT;
         }
     }
 
     // Renders all inventory slots with selection highlights, non-block overlays, and hover effects
-    private void drawInventorySlots(GuiGraphicsExtractor extract, int mx, int my) {
+    private void drawInventorySlots(GuiGraphicsExtractor extract, BlockSelectionScreenState state, int mx, int my) {
         LocalPlayer player = mc.player;
         if (player == null) {
             return;
@@ -141,14 +111,13 @@ public class BlockSelectionScreenRenderer {
         for (int row = 0; row < INVENTORY_ROW; row++) {
 
             for (int col = 0; col < INVENTORY_COL; col++) {
-                // Calculate slot index: row 3 = hotbar (0-8), rows 0-2 = main inventory (9-35)
-                int slotIndex = (row == 3) ? col : 9 + row * INVENTORY_COL + col;
+                int slotIndex = slotIndex(row, col);
                 ItemStack itemStack = player.getInventory().getItem(slotIndex);
 
                 boolean isBlock = itemStack.getItem() instanceof BlockItem;
                 Identifier blockId = isBlock ? BuiltInRegistries.ITEM.getKey(itemStack.getItem()) : null;
 
-                boolean selected = blockId != null && currentState.getWorkingWeights().containsKey(blockId);
+                boolean selected = blockId != null && state.containsWeight(blockId);
 
                 int x = leftPos + SLOT_X + col * (SLOT_SIZE + SLOT_PADDING_X);
                 int yOff = (row == 3) ? HOTBAR_Y : MAIN_Y + row * (SLOT_SIZE + SLOT_PADDING_Y);
@@ -163,8 +132,7 @@ public class BlockSelectionScreenRenderer {
                     extract.item(itemStack, x - 1, y - 1);
                     // Show weight number overlay on selected blocks
                     if (selected) {
-                        int w = currentState.getWorkingWeights().get(blockId);
-                        String weightStr = "§l" + w;
+                        String weightStr = "§l" + state.getWeight(blockId);
                         int tw = font.width(weightStr);
                         extract.text(font, weightStr, x + SLOT_SIZE - tw - 2, y + 2, 0xFFFFFF);
                     }
@@ -184,15 +152,12 @@ public class BlockSelectionScreenRenderer {
         }
     }
 
-    // Main render method: draws background, selected list, and inventory slots
-    public void render(GuiGraphicsExtractor extract, int mx, int my, float delta) {
-        if (currentState == null) {
-            return;
-        }
+    // Main render method: draws background, buttons, selected list, and inventory slots
+    public void render(GuiGraphicsExtractor extract, BlockSelectionScreenState state, CustomButton saveButton, CustomButton resetButton, int mx, int my) {
         drawBackground(extract);
-        selectionScreen.getSaveButton().render(extract);
-        selectionScreen.getResetButton().render(extract);
-        drawSelectedList(extract);
-        drawInventorySlots(extract, mx, my);
+        saveButton.render(extract);
+        resetButton.render(extract);
+        drawSelectedList(extract, state);
+        drawInventorySlots(extract, state, mx, my);
     }
 }

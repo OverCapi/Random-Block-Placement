@@ -12,7 +12,7 @@ import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 // Singleton that registers and handles all keybindings for the mod
-public final class Bind {
+public final class KeyBindings {
     // Custom keybinding category for organizing mod bindings in settings
     public static final KeyMapping.Category CATEGORY =
             KeyMapping.Category.register(
@@ -44,17 +44,16 @@ public final class Bind {
                     )
             );
 
-    public static final Bind INSTANCE = new Bind();
+    public static final KeyBindings INSTANCE = new KeyBindings();
 
-    // Placeholder — actual registration happens in the constructor
-    public static void load() {}
-
-    private Bind() {
-        register();
-    }
+    private KeyBindings() {}
 
     // Registers the client tick handler that checks for key presses
-    public void register() {
+    public static void load() {
+        INSTANCE.register();
+    }
+
+    private void register() {
         ClientTickEvents.END_CLIENT_TICK.register(this::onClientTick);
     }
 

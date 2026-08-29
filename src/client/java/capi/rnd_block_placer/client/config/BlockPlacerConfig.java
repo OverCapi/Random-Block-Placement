@@ -11,45 +11,45 @@ import net.minecraft.resources.Identifier;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 // Manages persistent configuration: selected blocks, their weights, and JSON serialization
 public class BlockPlacerConfig {
-    public static BlockPlacerConfig INSTANCE = new BlockPlacerConfig();
+    public static final BlockPlacerConfig INSTANCE = new BlockPlacerConfig();
     // Default weight assigned to newly selected blocks
     public static final int DEFAULT_WEIGHT = 100;
 
-    // Map of block identifier → weight for weighted random selection
-    private HashMap<Identifier, Integer> selectedBlocks = new HashMap<>();
+    private static final String SELECTED_BLOCKS_KEY = "selectedBlocks";
     // Pretty-printing Gson instance for JSON read/write
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
+    // Map of block identifier → weight for weighted random selection
+    private final Map<Identifier, Integer> selectedBlocks = new HashMap<>();
+
+    private BlockPlacerConfig() {}
+
     // Returns the set of selected block identifiers (keys only)
     public Set<Identifier> getSelectedBlocksKey() {
-        return selectedBlocks.keySet();
+        return Collections.unmodifiableSet(selectedBlocks.keySet());
     }
 
     // Returns the full block → weight map
-    public HashMap<Identifier, Integer> getSelectedBlocks() {
-        return selectedBlocks;
+    public Map<Identifier, Integer> getSelectedBlocks() {
+        return Collections.unmodifiableMap(selectedBlocks);
     }
 
-    // Returns the weight for a specific block, or null if not selected
-    public Integer getSelectedBlockWeight(Identifier id) {
-        return selectedBlocks.get(id);
+    // Returns the weight for a specific block, or 0 if not selected
+    public int getSelectedBlockWeight(Identifier id) {
+        return selectedBlocks.getOrDefault(id, 0);
     }
 
     // Replaces the entire selection with a new map
-    public void setSelectedBlocks(HashMap<Identifier, Integer> selectedBlocks) {
-        this.selectedBlocks.clear();
-        this.selectedBlocks.putAll(selectedBlocks);
-    }
-
-    // Clears all selected blocks
-    public void resetSelectedBlocks() {
+    public void setSelectedBlocks(Map<Identifier, Integer> newSelectedBlocks) {
         selectedBlocks.clear();
+        selectedBlocks.putAll(newSelectedBlocks);
     }
 
     // Persists the current selection to the config file as JSON
@@ -60,7 +60,7 @@ public class BlockPlacerConfig {
             for (Map.Entry<Identifier, Integer> entry : selectedBlocks.entrySet()) {
                 blocks.addProperty(entry.getKey().toString(), entry.getValue());
             }
-            root.add("selectedBlocks", blocks);
+            root.add(SELECTED_BLOCKS_KEY, blocks);
             Files.writeString(getConfigPath(), GSON.toJson(root));
         } catch (IOException e) {
             RandomBlockPlacer.LOGGER.error("Failed to save config file!", e);
@@ -75,7 +75,7 @@ public class BlockPlacerConfig {
             String content = Files.readString(path);
             JsonObject root = JsonParser.parseString(content).getAsJsonObject();
             selectedBlocks.clear();
-            JsonObject blocks = root.getAsJsonObject("selectedBlocks");
+            JsonObject blocks = root.getAsJsonObject(SELECTED_BLOCKS_KEY);
             if (blocks != null) {
                 for (String key : blocks.keySet()) {
                     String[] parts = key.split(":", 2);
@@ -84,8 +84,9 @@ public class BlockPlacerConfig {
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException e) {
             RandomBlockPlacer.LOGGER.error("Failed to load config file!", e);
+            selectedBlocks.clear();
         }
     }
 
