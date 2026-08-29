@@ -8,10 +8,14 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +24,15 @@ import static capi.rnd_block_placer.client.screen.BlockSelectionScreenConstants.
 // Preset management: scrollable preset list on the right, and a centered name input / create / save-to-preset section below the container
 public class PresetPanel {
     private static final long MESSAGE_DURATION_MS = 3000;
+    // Tooltip box sizing and colors
+    private static final int TOOLTIP_PADDING = 3;
+    private static final int TOOLTIP_ROW_HEIGHT = 18;
+    private static final int TOOLTIP_ICON_SIZE = 16;
+    private static final int TOOLTIP_ICON_GAP = 2;
+    private static final int TOOLTIP_MAX_TEXT_WIDTH = 120;
+    private static final int TOOLTIP_OFFSET_X = 8;
+    private static final int TOOLTIP_BACKGROUND_COLOR = 0xF0100010;
+    private static final int TOOLTIP_BORDER_COLOR = 0xFF1F001F;
 
     private final BlockSelectionScreenState state;
     private final Minecraft mc;
@@ -131,6 +144,7 @@ public class PresetPanel {
         renderRows(extract);
         renderBottomSection(extract, mx, my);
         renderMessage(extract);
+        renderTooltip(extract, mx, my);
     }
 
     // Loads the preset into the working and live selection, marking it as active
@@ -225,8 +239,9 @@ public class PresetPanel {
         int y = rowsStartY();
         for (int i = start; i < names.size() && i < start + PRESET_MAX_ROWS; i++) {
             String name = names.get(i);
+            boolean active = name.equals(BlockPlacerConfig.INSTANCE.getActivePreset());
             Component nameText = Component.literal(truncate(name, PRESET_NAME_MAX_WIDTH));
-            extract.text(font, nameText, panelX(), y + buttonAlignY(), PRESET_TEXT_COLOR);
+            extract.text(font, nameText, panelX(), y + buttonAlignY(), active ? PRESET_ACTIVE_COLOR : PRESET_TEXT_COLOR);
             renderCenteredLabel(extract, Component.translatable("button.rnd-block-placer.preset.select"),
                     selectButtonX(), y, PRESET_BUTTON_WIDTH, PRESET_BUTTON_HEIGHT);
             boolean armed = name.equals(armedDelete);
@@ -260,6 +275,90 @@ public class PresetPanel {
         int centerX = leftPos + DISPLAY_IMAGE_W / 2;
         int y = saveButtonBottomY() + PRESET_BUTTON_ROW_SPACING;
         extract.text(font, message, centerX - font.width(message) / 2, y, PRESET_MESSAGE_COLOR);
+    }
+
+    // Draws a preview box with the hovered preset's block icons and weights
+    private void renderTooltip(GuiGraphicsExtractor extract, int mx, int my) {
+        String name = hoveredPresetName(mx, my);
+        if (name == null) {
+            return;
+        }
+        List<Map.Entry<Identifier, Integer>> entries = presetPreviewEntries(name);
+        List<Component> weightLines = new ArrayList<>();
+        for (Map.Entry<Identifier, Integer> entry : entries) {
+            weightLines.add(weightLine(entry, totalWeight(entries)));
+        }
+        if (weightLines.isEmpty()) {
+            weightLines.add(Component.translatable("label.rnd-block-placer.preset.empty"));
+        }
+
+        int iconOffset = entries.isEmpty() ? 0 : TOOLTIP_ICON_SIZE + TOOLTIP_ICON_GAP;
+        int maxTextWidth = 0;
+        for (Component line : weightLines) {
+            maxTextWidth = Math.max(maxTextWidth, Math.min(font.width(line), TOOLTIP_MAX_TEXT_WIDTH));
+        }
+        int boxWidth = TOOLTIP_PADDING * 2 + iconOffset + maxTextWidth;
+        int boxHeight = weightLines.size() * TOOLTIP_ROW_HEIGHT + TOOLTIP_PADDING * 2;
+        int boxX = panelX() - boxWidth - TOOLTIP_OFFSET_X;
+        if (boxX < 4) {
+            boxX = 4;
+        }
+        int rowY = rowsStartY() + (int) ((my - rowsStartY()) / PRESET_ROW_HEIGHT) * PRESET_ROW_HEIGHT;
+        int maxY = mc.getWindow().getGuiScaledHeight() - boxHeight - 4;
+        int boxY = Math.max(4, Math.min(maxY, rowY));
+
+        extract.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight, TOOLTIP_BORDER_COLOR);
+        extract.fill(boxX + 1, boxY + 1, boxX + boxWidth - 1, boxY + boxHeight - 1, TOOLTIP_BACKGROUND_COLOR);
+        for (int i = 0; i < weightLines.size(); i++) {
+            int lineY = boxY + TOOLTIP_PADDING + i * TOOLTIP_ROW_HEIGHT;
+            if (!entries.isEmpty()) {
+                Identifier id = entries.get(i).getKey();
+                extract.item(new ItemStack(BuiltInRegistries.ITEM.getValue(id), 1), boxX + TOOLTIP_PADDING, lineY);
+            }
+            Component line = weightLines.get(i);
+            extract.text(font, line, boxX + TOOLTIP_PADDING + iconOffset, lineY + 4, PRESET_TEXT_COLOR);
+        }
+    }
+
+    // Returns the preset name under the cursor, or null when not over a preset row
+    private String hoveredPresetName(double mx, double my) {
+        if (mx < panelX() || mx > deleteButtonX() + PRESET_BUTTON_WIDTH || my < rowsStartY()) {
+            return null;
+        }
+        int row = (int) ((my - rowsStartY()) / PRESET_ROW_HEIGHT);
+        if (row < 0 || row >= PRESET_MAX_ROWS) {
+            return null;
+        }
+        List<String> names = presetNames();
+        int index = scrollOffset + row;
+        return index < names.size() ? names.get(index) : null;
+    }
+
+    // Returns a preset's block entries sorted by weight descending, ties broken by identifier
+    private List<Map.Entry<Identifier, Integer>> presetPreviewEntries(String name) {
+        Map<Identifier, Integer> blocks = BlockPlacerConfig.INSTANCE.getPreset(name);
+        if (blocks == null || blocks.isEmpty()) {
+            return List.of();
+        }
+        List<Map.Entry<Identifier, Integer>> sorted = new ArrayList<>(blocks.entrySet());
+        sorted.sort(Map.Entry.<Identifier, Integer>comparingByValue().reversed()
+                .thenComparing(Map.Entry.comparingByKey(Comparator.comparing(Identifier::toString))));
+        return sorted;
+    }
+
+    // Builds the "pct% (weight)" summary line for a block entry
+    private Component weightLine(Map.Entry<Identifier, Integer> entry, int total) {
+        return Component.translatable("label.rnd-block-placer.weight_summary",
+                entry.getValue() * 100 / total, entry.getValue());
+    }
+
+    // Returns the sum of all entry weights
+    private int totalWeight(List<Map.Entry<Identifier, Integer>> entries) {
+        int total = 0;
+        for (Map.Entry<Identifier, Integer> entry : entries) {
+            total += entry.getValue();
+        }
+        return total;
     }
 
     // Renders a label centered within the given button bounds

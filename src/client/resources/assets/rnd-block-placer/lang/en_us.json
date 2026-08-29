@@ -12,6 +12,7 @@
 	"label.rnd-block-placer.presets": "Presets",
 	"label.rnd-block-placer.preset.active": "§aActive: %s",
 	"label.rnd-block-placer.preset.more": "§7+%s preset (scroll)",
+	"label.rnd-block-placer.preset.empty": "§7Empty selection",
 	"button.rnd-block-placer.preset.name": "Preset name",
 	"button.rnd-block-placer.preset.name_hint": "Preset name",
 	"button.rnd-block-placer.preset.create": "Create",
