@@ -86,8 +86,8 @@ public class BlockSelectionScreen extends Screen {
         weightEditor = new WeightEditor(
                 font,
                 blockSelectionScreenState,
-                leftPos + SLOT_X,
-                topPos + DISPLAY_IMAGE_H - WEIGHT_INPUT_Y_OFFSET
+                leftPos,
+                topPos + DISPLAY_IMAGE_H + PRESET_BOTTOM_Y_OFFSET
         );
         addRenderableWidget(weightEditor.getInput());
 
@@ -109,7 +109,7 @@ public class BlockSelectionScreen extends Screen {
         blockSelectionScreenRenderer.render(extract, blockSelectionScreenState, saveButton, resetButton, mx, my);
 
         // Draw the weight label when editing is active
-        weightEditor.render(extract, leftPos, topPos);
+        weightEditor.render(extract);
 
         // Draw the preset management panel
         presetPanel.render(extract, mx, my);

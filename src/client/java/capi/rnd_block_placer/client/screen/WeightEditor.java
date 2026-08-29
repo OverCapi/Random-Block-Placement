@@ -14,7 +14,6 @@ import static capi.rnd_block_placer.client.screen.BlockSelectionScreenConstants.
 // Inline weight editor opened by Shift+click on a block: an EditBox plus a label describing the edited block
 public class WeightEditor {
     private static final int WIDTH = 60;
-    private static final int HEIGHT = 16;
     private static final int MAX_LENGTH = 4;
 
     private final EditBox input;
@@ -27,7 +26,8 @@ public class WeightEditor {
     public WeightEditor(Font font, BlockSelectionScreenState state, int x, int y) {
         this.font = font;
         this.state = state;
-        this.input = new EditBox(font, x, y, WIDTH, HEIGHT, Component.translatable("button.rnd-block-placer.weight"));
+        this.input = new EditBox(font, x, y, WIDTH, PRESET_NAME_INPUT_HEIGHT,
+                Component.translatable("button.rnd-block-placer.weight"));
         input.setMaxLength(MAX_LENGTH);
         input.setValue(String.valueOf(BlockPlacerConfig.DEFAULT_WEIGHT));
         input.setVisible(false);
@@ -92,8 +92,8 @@ public class WeightEditor {
     }
 
     // Draws the label above the input while editing
-    public void render(GuiGraphicsExtractor extract, int leftPos, int topPos) {
+    public void render(GuiGraphicsExtractor extract) {
         if (!isEditing()) return;
-        extract.text(font, label, leftPos + SLOT_X, topPos + DISPLAY_IMAGE_H - WEIGHT_LABEL_Y_OFFSET, WEIGHT_LABEL_COLOR);
+        extract.text(font, label, input.getX(), input.getY() - WEIGHT_LABEL_Y_OFFSET, WEIGHT_LABEL_COLOR);
     }
 }

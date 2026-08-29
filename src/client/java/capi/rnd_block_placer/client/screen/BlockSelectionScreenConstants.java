@@ -69,9 +69,9 @@ public class BlockSelectionScreenConstants {
     public static final int SELECTED_PANEL_TEXT_COLOR = 0xFFFFFFFF;
     public static final int SELECTED_PANEL_MORE_COLOR = 0xFF888888;
 
-    // Weight editor positioning (relative to the container)
-    public static final int WEIGHT_INPUT_Y_OFFSET = 4;
-    public static final int WEIGHT_LABEL_Y_OFFSET = 14;
+    // Weight editor alignment: X aligns with the menu's left edge, Y with the
+    // preset name input row below the container (shared bottom row)
+    public static final int WEIGHT_LABEL_Y_OFFSET = 12;
 
     // Preset panel positioning (to the right of the container)
     public static final int PRESET_PANEL_X_OFFSET = 336;
