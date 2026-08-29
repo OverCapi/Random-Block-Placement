@@ -246,8 +246,8 @@ public class PresetPanel {
                     selectButtonX(), y, PRESET_BUTTON_WIDTH, PRESET_BUTTON_HEIGHT);
             boolean armed = name.equals(armedDelete);
             Component deleteLabel = armed
-                    ? Component.translatable("button.rnd-block-placer.preset.confirm")
-                    : Component.translatable("button.rnd-block-placer.preset.delete");
+                    ? Component.translatable("button.rnd-block-placer.preset.confirm").withColor(0xFF800700)
+                    : Component.translatable("button.rnd-block-placer.preset.delete").withColor(0xFF800700);
             renderCenteredLabel(extract, deleteLabel, deleteButtonX(), y, PRESET_BUTTON_WIDTH, PRESET_BUTTON_HEIGHT);
             y += PRESET_ROW_HEIGHT;
         }
