@@ -8,10 +8,10 @@ import net.minecraft.resources.Identifier;
 public class BlockSelectionScreenConstants {
     // Selection menu asset
     public static final Identifier SELECTION_MENU_TEXTURE = RandomBlockPlacer.id("textures/gui/selection_menu.png");
-    public static final int IMAGE_W = 147;
-    public static final int IMAGE_H = 75;
-    public static final int DISPLAY_IMAGE_W = 220;
-    public static final int DISPLAY_IMAGE_H = 112;
+    public static final int IMAGE_W = 160;
+    public static final int IMAGE_H = 77;
+    public static final int DISPLAY_IMAGE_W = 320;
+    public static final int DISPLAY_IMAGE_H = 154;
 
     // Inventory grid: 4 rows (3 main + 1 hotbar) x 9 columns
     public static final int INVENTORY_ROW = 4;
@@ -42,16 +42,16 @@ public class BlockSelectionScreenConstants {
     );
 
     // Slot size and positioning within the container
-    public static final int SLOT_SIZE = 14;
+    public static final int SLOT_SIZE = 28;
     public static final int SLOT_X = 10;
-    public static final int SLOT_PADDING_X = 7;
-    public static final int SLOT_PADDING_Y = 12;
-    public static final int MAIN_Y = 12;
-    public static final int HOTBAR_Y = 88;
+    public static final int SLOT_PADDING_X = 6;
+    public static final int SLOT_PADDING_Y = 6;
+    public static final int MAIN_Y = 10;
+    public static final int HOTBAR_Y = 116;
 
     // Selected blocks panel positioning (relative to the container)
     public static final int SELECTED_PANEL_X_OFFSET = 115;
-    public static final int SELECTED_PANEL_Y_OFFSET = 40;
+    public static final int SELECTED_PANEL_Y_OFFSET = 20;
     public static final int SELECTED_PANEL_HEADER_Y_OFFSET = 14;
     public static final int SELECTED_PANEL_ROW_HEIGHT = 20;
     public static final int SELECTED_PANEL_BOTTOM_MARGIN = 10;
@@ -69,7 +69,7 @@ public class BlockSelectionScreenConstants {
     public static final int WEIGHT_LABEL_Y_OFFSET = 14;
 
     // Preset panel positioning (to the right of the container)
-    public static final int PRESET_PANEL_X_OFFSET = 236;
+    public static final int PRESET_PANEL_X_OFFSET = 336;
     public static final int PRESET_PANEL_Y_OFFSET = 20;
     public static final int PRESET_HEADER_COLOR = 0xFFCCCCCC;
     public static final int PRESET_ACTIVE_COLOR = 0xFF00CC00;

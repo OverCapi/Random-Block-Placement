@@ -68,15 +68,17 @@ public class BlockSelectionScreen extends Screen {
         leftPos = (width - DISPLAY_IMAGE_W) / 2;
         topPos = (height - DISPLAY_IMAGE_H) / 2;
 
+        int buttonSize = 24;
+        int buttonY = topPos - buttonSize - buttonSize / 4;
         resetButton = new CustomButton(
-                leftPos + 200, topPos + 20,
-                20, 20,
+                leftPos + DISPLAY_IMAGE_W / 4, buttonY,
+                buttonSize, buttonSize,
                 RESET_BUTTON_CLOSE,
                 this::reset
         );
         saveButton = new CustomButton(
-                leftPos + 200, topPos + 80,
-                20, 20,
+                (leftPos + 3 * DISPLAY_IMAGE_W / 4) - 20, buttonY,
+                buttonSize, buttonSize,
                 SAVE_BUTTON,
                 this::save
         );

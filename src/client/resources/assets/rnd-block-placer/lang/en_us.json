@@ -9,7 +9,7 @@
 	"label.rnd-block-placer.selected": "§lSelected:",
 	"label.rnd-block-placer.weight_summary": "%d%% (%d)",
 	"label.rnd-block-placer.more_scroll": "§7+%s more (scroll)",
-	"label.rnd-block-placer.presets": "Presets",
+	"label.rnd-block-placer.presets": "§lPresets",
 	"label.rnd-block-placer.preset.active": "§aActive: %s",
 	"label.rnd-block-placer.preset.more": "§7+%s preset (scroll)",
 	"label.rnd-block-placer.preset.empty": "§7Empty selection",

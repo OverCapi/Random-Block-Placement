@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import org.joml.Matrix3x2fStack;
 
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,10 @@ import static capi.rnd_block_placer.client.screen.BlockSelectionScreenConstants.
 
 // Handles all custom rendering for the block selection screen
 public class BlockSelectionScreenRenderer {
+    // Enlarged inventory item icon size (rendered from the 16px baked sprite)
+    private static final int INVENTORY_ICON_SIZE = 24;
+    private static final float INVENTORY_ICON_SCALE = (float) INVENTORY_ICON_SIZE / 16.0f;
+
     private int leftPos;
     private int topPos;
 
@@ -134,6 +139,19 @@ public class BlockSelectionScreenRenderer {
                 && my < panelY + maxSelectedRows() * SELECTED_PANEL_ROW_HEIGHT;
     }
 
+    // Draws the enlarged item icon centered on its slot, via pose scaling about the slot center
+    private void drawInventoryIcon(GuiGraphicsExtractor extract, ItemStack stack, int slotX, int slotY) {
+        float cx = slotX + SLOT_SIZE / 2.0f;
+        float cy = slotY + SLOT_SIZE / 2.0f;
+        Matrix3x2fStack pose = extract.pose();
+        pose.pushMatrix();
+        pose.translate(cx, cy);
+        pose.scale(INVENTORY_ICON_SCALE);
+        pose.translate(-cx, -cy);
+        extract.item(stack, slotX + (SLOT_SIZE - 16) / 2, slotY + (SLOT_SIZE - 16) / 2);
+        pose.popMatrix();
+    }
+
     // Renders all inventory slots with selection highlights, non-block overlays, and hover effects
     private void drawInventorySlots(GuiGraphicsExtractor extract, BlockSelectionScreenState state, int mx, int my) {
         LocalPlayer player = mc.player;
@@ -158,11 +176,11 @@ public class BlockSelectionScreenRenderer {
 
                 // Draw slot background: green if selected, default sprite otherwise
                 if (selected) {
-                    extract.fill(x, y, x + SLOT_SIZE, y + SLOT_SIZE, GREEN_SEL);
+                    extract.fill(x, y, x + 28, y + 28, GREEN_SEL);
                 }
 
                 if (!itemStack.isEmpty()) {
-                    extract.item(itemStack, x - 1, y - 1);
+                    drawInventoryIcon(extract, itemStack, x, y);
                     // Show weight number overlay on selected blocks
                     if (selected) {
                         String weightStr = "§l" + state.getWeight(blockId);
@@ -173,13 +191,13 @@ public class BlockSelectionScreenRenderer {
 
                 // Gray overlay for non-block items (cannot be selected)
                 if (!itemStack.isEmpty() && !isBlock) {
-                    extract.fill(x, y, x + SLOT_SIZE, y + SLOT_SIZE, GRAY_OVERLAY);
+                    extract.fill(x, y, x + 28, y + 28, GRAY_OVERLAY);
                 }
 
                 // White hover highlight
                 boolean hovered = mx >= x && mx < x + SLOT_SIZE && my >= y && my < y + SLOT_SIZE;
                 if (hovered) {
-                    extract.fill(x, y, x + SLOT_SIZE, y + SLOT_SIZE, HOVER);
+                    extract.fill(x, y, x + 28, y + 28, HOVER);
                     if (!itemStack.isEmpty()) {
                         drawHoverName(extract, itemStack, x, y);
                     }
