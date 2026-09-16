@@ -3,6 +3,7 @@ package capi.rnd_block_placer.client.screen;
 import capi.rnd_block_placer.client.blockPlacer.BlockPlacer;
 import capi.rnd_block_placer.client.config.BlockPlacerConfig;
 import capi.rnd_block_placer.client.screen.widget.CustomButton;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -124,7 +125,7 @@ public class BlockSelectionScreen extends Screen {
             return super.mouseClicked(event, consumed);
         }
         // Only handle left-click
-        if (event.buttonInfo().button() != 0) {
+        if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
             return super.mouseClicked(event, consumed);
         }
 

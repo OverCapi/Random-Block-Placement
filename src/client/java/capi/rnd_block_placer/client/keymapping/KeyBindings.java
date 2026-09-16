@@ -9,7 +9,6 @@ import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
-import org.lwjgl.glfw.GLFW;
 
 // Singleton that registers and handles all keybindings for the mod
 public final class KeyBindings {
@@ -27,7 +26,7 @@ public final class KeyBindings {
             KeyMappingHelper.registerKeyMapping(
                     new KeyMapping(
                             "key." + RandomBlockPlacer.MOD_ID + ".toggle_selection_screen",
-                            InputConstants.Type.KEYSYM,
+                            InputConstants.Type.KEYBOARD,
                             InputConstants.KEY_B,
                             CATEGORY
                     )
@@ -38,8 +37,8 @@ public final class KeyBindings {
             KeyMappingHelper.registerKeyMapping(
                     new KeyMapping(
                             "key." + RandomBlockPlacer.MOD_ID + ".toggle_block_placement",
-                            InputConstants.Type.KEYSYM,
-                            GLFW.GLFW_KEY_J,
+                            InputConstants.Type.KEYBOARD,
+                            InputConstants.KEY_J,
                             CATEGORY
                     )
             );
