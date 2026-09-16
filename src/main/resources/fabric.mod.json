@@ -3,7 +3,7 @@
 	"id": "rnd-block-placer",
 	"version": "${version}",
 	"name": "Random Block Placer",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Random Block Placer is a simple mod to place random block ",
 	"authors": [
 		"Over_Capi"
 	],
