@@ -217,12 +217,12 @@ public class PresetPanel {
         int y = rowsStartY();
         for (int i = start; i < names.size() && i < start + PRESET_MAX_ROWS; i++) {
             String name = names.get(i);
-            if (hit(mx, my, selectButtonX(), y, PRESET_BUTTON_WIDTH, PRESET_BUTTON_HEIGHT)) {
+            if (hit(mx, my, selectButtonX(), buttonRowY(y), PRESET_BUTTON_WIDTH, PRESET_BUTTON_HEIGHT)) {
                 clickSound();
                 handleSelect(name);
                 return true;
             }
-            if (hit(mx, my, deleteButtonX(), y, PRESET_BUTTON_WIDTH, PRESET_BUTTON_HEIGHT)) {
+            if (hit(mx, my, deleteButtonX(), buttonRowY(y), PRESET_BUTTON_WIDTH, PRESET_BUTTON_HEIGHT)) {
                 clickSound();
                 handleDelete(name);
                 return true;
@@ -242,12 +242,12 @@ public class PresetPanel {
             Component nameText = Component.literal(truncate(name, PRESET_NAME_MAX_WIDTH));
             extract.text(font, nameText, panelX(), y + buttonAlignY(), active ? PRESET_ACTIVE_COLOR : PRESET_TEXT_COLOR);
             renderCenteredLabel(extract, Component.translatable("button.rnd-block-placer.preset.select"),
-                    selectButtonX(), y, PRESET_BUTTON_WIDTH, PRESET_BUTTON_HEIGHT);
+                    selectButtonX(), buttonRowY(y), PRESET_BUTTON_WIDTH, PRESET_BUTTON_HEIGHT);
             boolean armed = name.equals(armedDelete);
             Component deleteLabel = armed
                     ? Component.translatable("button.rnd-block-placer.preset.confirm").withColor(0xFF800700)
                     : Component.translatable("button.rnd-block-placer.preset.delete").withColor(0xFF800700);
-            renderCenteredLabel(extract, deleteLabel, deleteButtonX(), y, PRESET_BUTTON_WIDTH, PRESET_BUTTON_HEIGHT);
+            renderCenteredLabel(extract, deleteLabel, deleteButtonX(), buttonRowY(y), PRESET_BUTTON_WIDTH, PRESET_BUTTON_HEIGHT);
             y += PANEL_ROW_HEIGHT;
         }
 
@@ -413,6 +413,11 @@ public class PresetPanel {
 
     private int buttonAlignY() {
         return (PANEL_ROW_HEIGHT - font.lineHeight) / 2;
+    }
+
+    // Vertically centers the 12px-tall buttons within the 20px row
+    private int buttonRowY(int rowY) {
+        return rowY + (PANEL_ROW_HEIGHT - PRESET_BUTTON_HEIGHT) / 2;
     }
 
     private void showMessage(Component newMessage) {
