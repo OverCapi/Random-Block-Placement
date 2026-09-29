@@ -27,9 +27,9 @@ public class BlockSelectionScreenConstants {
     // Height reserved below the grid for the two help lines
     public static final int HINT_HEIGHT = 22;
 
-    // Sidebar width bounds and the height the panels grow to when space allows
-    public static final int SIDEBAR_MIN_WIDTH = 110;
-    public static final int SIDEBAR_MAX_WIDTH = 170;
+    // Side panel width bounds and the height the panels grow to when space allows
+    public static final int SIDE_PANEL_MIN_WIDTH = 110;
+    public static final int SIDE_PANEL_MAX_WIDTH = 160;
     public static final int PANEL_PREFERRED_HEIGHT = 190;
 
     // Sidebar contents
@@ -37,6 +37,8 @@ public class BlockSelectionScreenConstants {
     public static final int SIDEBAR_ROW_HEIGHT = 18;
     public static final int SIDEBAR_SPACING = 4;
     public static final int SCROLLBAR_WIDTH = 2;
+    // Height of a side panel title line, when panels are shown side by side
+    public static final int PANEL_TITLE_HEIGHT = 12;
 
     // Footer buttons
     public static final int FOOTER_BUTTON_WIDTH = 90;

@@ -28,7 +28,7 @@ Link to the demo video on Youtube https://youtu.be/gzuZTy42xg0
 
 ### 1. Open the selection menu
 
-Press **B** to open the block selection menu. Your inventory is on the left, and a sidebar with two tabs, **Selection** and **Presets**, is on the right.
+Press **B** to open the block selection menu. Your **Selection** is on the left, your inventory in the middle, and your **Presets** on the right. On small screens, Selection and Presets become two tabs next to the inventory.
 
 ### 2. Select your blocks
 
@@ -36,11 +36,13 @@ Click a block in your inventory to add it to the selection. Click it again to re
 
 ### 3. Set custom probabilities (optional)
 
-Every block starts with a weight of 100. To change it, **Shift+click** the block in your inventory, or click its row in the **Selection** tab. Type the new weight and press **Enter**. A weight of 0 removes the block.
+Blocks start with an equal chance. To change a block's chance, **Shift+click** it in your inventory, or click its row in the **Selection** panel. Type a percentage and press **Enter**.
 
-The Selection tab shows each block's chance of being placed.
+The other blocks share the remaining percentage and keep their proportions. For example, with Stone, Andesite and Gravel at 33% each, setting Stone to 50% gives 25% to Andesite and 25% to Gravel. A value of 0 removes the block.
 
-**Clear selection** at the bottom of the tab removes every block from the selection. Your presets are not affected.
+The Selection panel shows each block's chance of being placed.
+
+**Clear selection** at the bottom of the panel removes every block from the selection. Your presets are not affected.
 
 ### 4. Enable Random Placement
 
@@ -52,7 +54,7 @@ Close the menu and place blocks as usual!
 
 ## Presets
 
-The **Presets** tab lets you save and reuse selections:
+The **Presets** panel lets you save and reuse selections:
 
 - **Create**: type a name and click Create to save the current selection as a new preset.
 - **Load**: click a preset to select it, then click Load (or double-click it) to replace the current selection with it.
@@ -61,7 +63,7 @@ The **Presets** tab lets you save and reuse selections:
 
 Overwrite and Delete ask you to click a second time to confirm. Hover a preset to preview its blocks.
 
-The top of the tab shows which preset is loaded, and marks it as **(modified)** when the selection has changed since.
+The top of the panel shows which preset is loaded, and marks it as **(modified)** when the selection has changed since.
 
 ---
 
@@ -77,7 +79,7 @@ If you prefer to save manually, open the settings with the **⚙** button and se
 
 | Key | Action |
 |------|--------|
-| **B** | Open the configuration menu |
+| **B** | Open / close the configuration menu |
 | **J** | Enable / Disable random placement |
 
 ---

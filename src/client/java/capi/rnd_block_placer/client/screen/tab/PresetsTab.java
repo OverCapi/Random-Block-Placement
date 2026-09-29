@@ -282,7 +282,7 @@ public class PresetsTab extends SidebarTab {
                 Map.Entry<Identifier, Integer> entry = sorted.get(i);
                 Component itemName = new ItemStack(BuiltInRegistries.ITEM.getValue(entry.getKey())).getHoverName();
                 lines.add(Component.translatable("tooltip.rnd-block-placer.preset.entry",
-                        itemName, entry.getValue() * 100 / total, entry.getValue()).withStyle(ChatFormatting.GRAY));
+                        itemName, BlockSelectionScreenState.percent(entry.getValue(), total)).withStyle(ChatFormatting.GRAY));
             }
             if (sorted.size() > PREVIEW_MAX_LINES) {
                 lines.add(Component.translatable("tooltip.rnd-block-placer.preset.more", sorted.size() - PREVIEW_MAX_LINES)

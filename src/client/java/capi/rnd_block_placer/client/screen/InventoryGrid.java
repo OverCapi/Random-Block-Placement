@@ -92,10 +92,9 @@ public class InventoryGrid {
             return List.of(name, Component.translatable("tooltip.rnd-block-placer.not_a_block").withStyle(ChatFormatting.GRAY));
         }
         if (state.containsWeight(id)) {
-            int weight = state.getWeight(id);
             return List.of(
                     name,
-                    Component.translatable("tooltip.rnd-block-placer.weight", weight, state.percentOf(weight)).withStyle(ChatFormatting.GREEN),
+                    Component.translatable("tooltip.rnd-block-placer.weight", state.percentOf(state.getWeight(id))).withStyle(ChatFormatting.GREEN),
                     Component.translatable("tooltip.rnd-block-placer.click_remove").withStyle(ChatFormatting.GRAY)
             );
         }

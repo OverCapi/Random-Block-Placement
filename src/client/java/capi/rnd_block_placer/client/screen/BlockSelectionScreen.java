@@ -3,6 +3,7 @@ package capi.rnd_block_placer.client.screen;
 import capi.rnd_block_placer.client.blockPlacer.BlockPlacer;
 import capi.rnd_block_placer.client.config.BlockPlacerConfig;
 import capi.rnd_block_placer.client.config.SaveMode;
+import capi.rnd_block_placer.client.keymapping.KeyBindings;
 import capi.rnd_block_placer.client.screen.tab.PresetsTab;
 import capi.rnd_block_placer.client.screen.tab.SelectionTab;
 import capi.rnd_block_placer.client.screen.tab.SidebarTab;
@@ -10,6 +11,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
@@ -20,9 +22,12 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
+import java.util.List;
+
 import static capi.rnd_block_placer.client.screen.BlockSelectionScreenConstants.*;
 
-// Block selection screen: clickable inventory on the left, Selection/Presets tabs on the right
+// Block selection screen: Selection panel, clickable inventory and Presets panel side by side
+// (on narrow windows the two panels become tabs to the right of the inventory)
 public class BlockSelectionScreen extends Screen {
     private static final int SETTINGS_BUTTON_SIZE = 20;
 
@@ -52,6 +57,11 @@ public class BlockSelectionScreen extends Screen {
 
     private SidebarTab activeTab() {
         return currentTab == Tab.SELECTION ? selectionTab : presetsTab;
+    }
+
+    // Panels currently on screen: both when split, only the active tab otherwise
+    private List<SidebarTab> visibleTabs() {
+        return layout.split() ? List.of(selectionTab, presetsTab) : List.of(activeTab());
     }
 
     // Switches the sidebar tab, rebuilding the widgets of the newly shown tab
@@ -99,9 +109,18 @@ public class BlockSelectionScreen extends Screen {
                         }));
     }
 
-    // Tab buttons on top, then the active tab's content below
+    // Split: Selection panel on the left, Presets panel on the right, each under a title.
+    // Narrow: a single panel with tab buttons on top and the active tab's content below.
     private void initSidebar() {
-        ScreenRectangle inner = layout.sidebarInner();
+        selectionTabButton = null;
+        presetsTabButton = null;
+        if (layout.split()) {
+            selectionTab.init(belowTitle(layout.leftPanel()), widget -> addRenderableWidget(widget));
+            presetsTab.init(belowTitle(layout.rightPanel()), widget -> addRenderableWidget(widget));
+            return;
+        }
+
+        ScreenRectangle inner = SelectionLayout.inner(layout.rightPanel());
         int halfWidth = (inner.width() - 2) / 2;
         selectionTabButton = addRenderableWidget(Button.builder(selectionTab.title(), button -> selectTab(Tab.SELECTION))
                 .bounds(inner.left(), inner.top(), halfWidth, SIDEBAR_BUTTON_HEIGHT)
@@ -113,6 +132,13 @@ public class BlockSelectionScreen extends Screen {
         int contentTop = inner.top() + SIDEBAR_BUTTON_HEIGHT + SIDEBAR_SPACING + 2;
         ScreenRectangle content = new ScreenRectangle(inner.left(), contentTop, inner.width(), inner.bottom() - contentTop);
         activeTab().init(content, widget -> addRenderableWidget(widget));
+    }
+
+    // A panel's inner area below its title line
+    private static ScreenRectangle belowTitle(ScreenRectangle panel) {
+        ScreenRectangle inner = SelectionLayout.inner(panel);
+        return new ScreenRectangle(inner.left(), inner.top() + PANEL_TITLE_HEIGHT,
+                inner.width(), inner.height() - PANEL_TITLE_HEIGHT);
     }
 
     // "Done" in on-close mode; "Cancel"/"Close" and "Apply" in manual mode
@@ -138,10 +164,12 @@ public class BlockSelectionScreen extends Screen {
 
     // Refreshes labels and enabled state that depend on the working state
     private void updateWidgets() {
-        selectionTabButton.setMessage(selectionTab.title());
-        selectionTabButton.active = currentTab != Tab.SELECTION;
-        presetsTabButton.setMessage(presetsTab.title());
-        presetsTabButton.active = currentTab != Tab.PRESETS;
+        if (selectionTabButton != null) {
+            selectionTabButton.setMessage(selectionTab.title());
+            selectionTabButton.active = currentTab != Tab.SELECTION;
+            presetsTabButton.setMessage(presetsTab.title());
+            presetsTabButton.active = currentTab != Tab.PRESETS;
+        }
 
         if (placementToggle.getValue() != BlockPlacer.INSTANCE.isEnabled()) {
             placementToggle.setValue(BlockPlacer.INSTANCE.isEnabled());
@@ -154,19 +182,19 @@ public class BlockSelectionScreen extends Screen {
             cancelButton.setTooltip(dirty ? Tooltip.create(Component.translatable("tooltip.rnd-block-placer.cancel")) : null);
         }
 
-        activeTab().updateWidgets();
+        for (SidebarTab tab : visibleTabs()) {
+            tab.updateWidgets();
+        }
     }
 
     @Override
     public void extractBackground(GuiGraphicsExtractor extract, int mx, int my, float delta) {
         super.extractBackground(extract, mx, my, delta);
-        drawPanel(extract, layout.inventoryPanel());
-        drawPanel(extract, layout.sidebar());
-    }
-
-    private static void drawPanel(GuiGraphicsExtractor extract, ScreenRectangle panel) {
-        extract.fill(panel.left(), panel.top(), panel.right(), panel.bottom(), PANEL_COLOR);
-        extract.outline(panel.left(), panel.top(), panel.width(), panel.height(), PANEL_BORDER_COLOR);
+        PanelStyle.drawPanel(extract, layout.inventoryPanel());
+        PanelStyle.drawPanel(extract, layout.rightPanel());
+        if (layout.split()) {
+            PanelStyle.drawPanel(extract, layout.leftPanel());
+        }
     }
 
     @Override
@@ -174,14 +202,19 @@ public class BlockSelectionScreen extends Screen {
         updateWidgets();
         super.extractRenderState(extract, mx, my, delta);
 
-        ScreenRectangle header = layout.header();
-        extract.text(font, title, header.left() + 2, header.top() + (HEADER_HEIGHT - font.lineHeight) / 2 + 1, TEXT_COLOR);
+        PanelStyle.drawHeaderTitle(extract, font, layout.header(), title);
 
         LocalPlayer player = minecraft.player;
         if (player != null) {
             grid.render(extract, layout, player, mx, my);
         }
-        activeTab().render(extract, mx, my);
+        if (layout.split()) {
+            PanelStyle.drawPanelTitle(extract, font, layout.leftPanel(), selectionTab.title());
+            PanelStyle.drawPanelTitle(extract, font, layout.rightPanel(), presetsTab.title());
+        }
+        for (SidebarTab tab : visibleTabs()) {
+            tab.render(extract, mx, my);
+        }
 
         if (applyButton != null && state.isDirty()) {
             ScreenRectangle footer = layout.footer();
@@ -199,16 +232,23 @@ public class BlockSelectionScreen extends Screen {
         if (super.mouseClicked(event, doubleClick)) {
             return true;
         }
+        // Same toggle when the screen key is bound to a mouse button
+        if (KeyBindings.INSTANCE.getSelectionScreenKey().matchesMouse(event)) {
+            onClose();
+            return true;
+        }
         if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
             return false;
         }
-        if (activeTab().mouseClicked(mx, my)) {
-            return true;
+        for (SidebarTab tab : visibleTabs()) {
+            if (tab.mouseClicked(mx, my)) {
+                return true;
+            }
         }
         return clickSlot(mx, my, event.hasShiftDown());
     }
 
-    // Click toggles a block in the selection; Shift+click opens its weight editor
+    // Click toggles a block in the selection; Shift+click opens its chance editor
     private boolean clickSlot(double mx, double my, boolean shift) {
         LocalPlayer player = minecraft.player;
         int slot = layout.slotAt(mx, my);
@@ -221,29 +261,40 @@ public class BlockSelectionScreen extends Screen {
         }
 
         if (shift) {
-            selectTab(Tab.SELECTION);
+            if (!layout.split()) {
+                selectTab(Tab.SELECTION);
+            }
             selectionTab.startEditing(id);
         } else if (state.containsWeight(id)) {
             state.removeWeight(id);
             selectionTab.stopEditing(id);
         } else {
-            state.setWeight(id, BlockPlacerConfig.DEFAULT_WEIGHT);
+            state.addBlock(id);
         }
         return true;
     }
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        if (activeTab().keyPressed(event)) {
+        // The key that opened the screen also closes it, unless it is being typed into a text field
+        if (!(getFocused() instanceof EditBox) && KeyBindings.INSTANCE.getSelectionScreenKey().matches(event)) {
+            onClose();
             return true;
+        }
+        for (SidebarTab tab : visibleTabs()) {
+            if (tab.keyPressed(event)) {
+                return true;
+            }
         }
         return super.keyPressed(event);
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        if (activeTab().mouseScrolled(mouseX, mouseY, verticalAmount)) {
-            return true;
+        for (SidebarTab tab : visibleTabs()) {
+            if (tab.mouseScrolled(mouseX, mouseY, verticalAmount)) {
+                return true;
+            }
         }
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }

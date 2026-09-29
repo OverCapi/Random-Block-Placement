@@ -11,6 +11,11 @@ import java.util.Objects;
 
 // Working copy of the selection and loaded preset, isolated from the persisted config until applied
 public class BlockSelectionScreenState {
+    // Weights set from a percentage are stored in hundredths of a percent (100% = 10000)
+    private static final int PERCENT_SCALE = 100;
+    // Highest percentage a block can get while other blocks are selected, so they keep a share
+    public static final int MAX_PERCENT_WITH_OTHERS = 99;
+
     // Working copy of the block→weight map (not yet applied)
     private final Map<Identifier, Integer> workingWeights = new HashMap<>();
     // Name of the preset the working selection was loaded from, or null
@@ -43,18 +48,51 @@ public class BlockSelectionScreenState {
         return workingWeights.getOrDefault(id, 0);
     }
 
-    // Returns the weight of the given block, or a fallback if not selected
-    public int getWeightOrElse(Identifier id, int fallback) {
-        return workingWeights.getOrDefault(id, fallback);
+    // Adds a block with the average weight of the current selection, so it gets an even share
+    public void addBlock(Identifier id) {
+        int weight = isEmpty() ? BlockPlacerConfig.DEFAULT_WEIGHT : Math.max(1, Math.round((float) totalWeight() / size()));
+        workingWeights.put(id, weight);
     }
 
-    // Sets the weight of a block; values ≤ 0 remove it from the selection
-    public void setWeight(Identifier id, int weight) {
-        if (weight <= 0) {
-            workingWeights.remove(id);
-        } else {
-            workingWeights.put(id, weight);
+    // Percentage the block has, or would get if added now (even share with the current blocks)
+    public int percentOrDefault(Identifier id) {
+        if (containsWeight(id)) {
+            return percentOf(getWeight(id));
         }
+        return Math.round(100.0f / (size() + 1));
+    }
+
+    // Sets the block's chance to the given percentage. The other blocks share the rest and keep
+    // their relative proportions. 0 removes the block; a block alone always has 100%.
+    public void setPercent(Identifier id, int percent) {
+        if (percent <= 0) {
+            workingWeights.remove(id);
+            return;
+        }
+        Map<Identifier, Integer> others = new HashMap<>(workingWeights);
+        others.remove(id);
+        if (others.isEmpty()) {
+            workingWeights.put(id, workingWeights.getOrDefault(id, BlockPlacerConfig.DEFAULT_WEIGHT));
+            return;
+        }
+        percent = Math.min(percent, MAX_PERCENT_WITH_OTHERS);
+
+        // Rescale the other blocks so they sum to exactly (100 - percent) * PERCENT_SCALE
+        int othersTarget = (100 - percent) * PERCENT_SCALE;
+        long othersSum = others.values().stream().mapToLong(Integer::longValue).sum();
+        int assigned = 0;
+        Identifier largest = null;
+        for (Map.Entry<Identifier, Integer> entry : others.entrySet()) {
+            int weight = (int) Math.max(1, Math.round((double) entry.getValue() * othersTarget / othersSum));
+            workingWeights.put(entry.getKey(), weight);
+            assigned += weight;
+            if (largest == null || weight > workingWeights.get(largest)) {
+                largest = entry.getKey();
+            }
+        }
+        // Give the rounding difference to the heaviest block so the total stays exact
+        workingWeights.put(largest, Math.max(1, workingWeights.get(largest) + othersTarget - assigned));
+        workingWeights.put(id, percent * PERCENT_SCALE);
     }
 
     // Removes the given block from the working selection
@@ -103,10 +141,14 @@ public class BlockSelectionScreenState {
         return total;
     }
 
-    // Returns the given weight as a percentage of the total working weight
+    // Returns the given weight as a rounded percentage of the total working weight
     public int percentOf(int weight) {
-        int total = totalWeight();
-        return total <= 0 ? 0 : weight * 100 / total;
+        return percent(weight, totalWeight());
+    }
+
+    // Returns weight / total as a rounded percentage
+    public static int percent(int weight, int total) {
+        return total <= 0 ? 0 : Math.round(weight * 100.0f / total);
     }
 
     // Returns working weights sorted by weight descending, ties broken by identifier

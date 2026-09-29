@@ -1,6 +1,5 @@
 package capi.rnd_block_placer.client.screen.tab;
 
-import capi.rnd_block_placer.client.config.BlockPlacerConfig;
 import capi.rnd_block_placer.client.screen.BlockSelectionScreenState;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -22,18 +21,18 @@ import java.util.function.Consumer;
 
 import static capi.rnd_block_placer.client.screen.BlockSelectionScreenConstants.*;
 
-// "Selection" tab: the selected blocks with their share, a weight editor and a clear button
+// "Selection" tab: the selected blocks with their chance, a percentage editor and a clear button
 public class SelectionTab extends SidebarTab {
     private static final int LABEL_HEIGHT = 11;
     private static final int EDITOR_HEIGHT = LABEL_HEIGHT + SIDEBAR_BUTTON_HEIGHT;
     private static final int CONFIRM_BUTTON_WIDTH = 24;
     private static final int REMOVE_WIDTH = 10;
-    private static final int WEIGHT_MAX_LENGTH = 4;
+    private static final int PERCENT_MAX_LENGTH = 3;
 
     private final BlockSelectionScreenState state;
     private final Consumer<GuiEventListener> focus;
 
-    // Block whose weight is being edited, and the text typed so far (kept across widget rebuilds)
+    // Block whose chance is being edited, and the percentage typed so far (kept across widget rebuilds)
     private Identifier editingId;
     private String editingText = "";
 
@@ -63,7 +62,8 @@ public class SelectionTab extends SidebarTab {
         int boxY = editorY + LABEL_HEIGHT;
         weightBox = new EditBox(font, area.left(), boxY, area.width() - CONFIRM_BUTTON_WIDTH - 2, SIDEBAR_BUTTON_HEIGHT,
                 Component.translatable("button.rnd-block-placer.weight"));
-        weightBox.setMaxLength(WEIGHT_MAX_LENGTH);
+        weightBox.setMaxLength(PERCENT_MAX_LENGTH);
+        weightBox.setHint(Component.translatable("button.rnd-block-placer.weight.hint"));
         weightBox.setValue(editingText);
         weightBox.setResponder(this::onWeightTyped);
 
@@ -95,10 +95,10 @@ public class SelectionTab extends SidebarTab {
         clearButton.active = !state.isEmpty();
     }
 
-    // Opens the weight editor for the given block, pre-filled with its current weight
+    // Opens the chance editor for the given block, pre-filled with its current percentage
     public void startEditing(Identifier id) {
         editingId = id;
-        editingText = String.valueOf(state.getWeightOrElse(id, BlockPlacerConfig.DEFAULT_WEIGHT));
+        editingText = String.valueOf(state.percentOrDefault(id));
         if (weightBox != null) {
             weightBox.setValue(editingText);
             weightBox.moveCursorToEnd(false);
@@ -111,7 +111,7 @@ public class SelectionTab extends SidebarTab {
         }
     }
 
-    // Closes the weight editor without applying the typed value
+    // Closes the chance editor without applying the typed value
     public void stopEditing() {
         editingId = null;
         editingText = "";
@@ -127,21 +127,21 @@ public class SelectionTab extends SidebarTab {
         }
     }
 
-    // Applies the typed weight (0 removes the block), then closes the editor
+    // Applies the typed percentage (0 removes the block), then closes the editor
     private void confirmEdit() {
         if (editingId == null) {
             return;
         }
         try {
-            state.setWeight(editingId, Integer.parseInt(editingText));
+            state.setPercent(editingId, Integer.parseInt(editingText));
         } catch (NumberFormatException e) {
-            // Empty input: keep the previous weight
+            // Empty input: keep the previous chance
         }
         stopEditing();
         clampScroll();
     }
 
-    // Keeps only digits in the weight input
+    // Keeps only digits in the percentage input
     private void onWeightTyped(String value) {
         String digits = value.replaceAll("[^0-9]", "");
         if (!digits.equals(value)) {
@@ -195,7 +195,7 @@ public class SelectionTab extends SidebarTab {
             extract.text(font, "✕", removeX + 2, textY, overRemove ? TEXT_REMOVE_COLOR : TEXT_MUTED_COLOR);
 
             Component summary = Component.translatable("label.rnd-block-placer.weight_summary",
-                    state.percentOf(entry.getValue()), entry.getValue());
+                    state.percentOf(entry.getValue()));
             int summaryX = removeX - 2 - font.width(summary);
             extract.text(font, summary, summaryX, textY, TEXT_COLOR);
 
@@ -213,7 +213,7 @@ public class SelectionTab extends SidebarTab {
         renderEditorLabel(extract);
     }
 
-    // Draws the "Weight of X" label while editing, or a hint on how to edit otherwise
+    // Draws the "Chance: X" label while editing, or a hint on how to edit otherwise
     private void renderEditorLabel(GuiGraphicsExtractor extract) {
         if (editingId == null) {
             extract.textWithWordWrap(font, Component.translatable("hint.rnd-block-placer.edit_weight"),
