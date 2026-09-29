@@ -21,7 +21,7 @@ public final class KeyBindings {
                     )
             );
 
-    // Keybinding: opens the block selection screen (default: B)
+    // Keybinding: opens the block selection screen, and closes it when pressed again (default: B)
     private final KeyMapping openSelectionScreen =
             KeyMappingHelper.registerKeyMapping(
                     new KeyMapping(
@@ -46,6 +46,11 @@ public final class KeyBindings {
     public static final KeyBindings INSTANCE = new KeyBindings();
 
     private KeyBindings() {}
+
+    // The key that opens and closes the block selection screen
+    public KeyMapping getSelectionScreenKey() {
+        return openSelectionScreen;
+    }
 
     // Registers the client tick handler that checks for key presses
     public static void load() {
