@@ -26,6 +26,7 @@ public class BlockPlacerConfig {
     private static final String SELECTED_BLOCKS_KEY = "selectedBlocks";
     private static final String PRESETS_KEY = "presets";
     private static final String ACTIVE_PRESET_KEY = "activePreset";
+    private static final String SAVE_MODE_KEY = "saveMode";
     // Pretty-printing Gson instance for JSON read/write
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
@@ -35,6 +36,8 @@ public class BlockPlacerConfig {
     private final Map<String, Map<Identifier, Integer>> presets = new LinkedHashMap<>();
     // Name of the currently selected preset, or null when none is selected
     private String activePreset = null;
+    // When the selection screen writes its changes to the config
+    private SaveMode saveMode = SaveMode.ON_CLOSE;
 
     private BlockPlacerConfig() {}
 
@@ -98,6 +101,16 @@ public class BlockPlacerConfig {
         activePreset = null;
     }
 
+    // Returns when the selection screen applies its changes
+    public SaveMode getSaveMode() {
+        return saveMode;
+    }
+
+    // Sets when the selection screen applies its changes
+    public void setSaveMode(SaveMode saveMode) {
+        this.saveMode = saveMode;
+    }
+
     // Persists the current selection to the config file as JSON
     public void save() {
         try {
@@ -111,6 +124,7 @@ public class BlockPlacerConfig {
             if (activePreset != null) {
                 root.addProperty(ACTIVE_PRESET_KEY, activePreset);
             }
+            root.addProperty(SAVE_MODE_KEY, saveMode.name());
             Files.writeString(getConfigPath(), GSON.toJson(root));
         } catch (IOException e) {
             RandomBlockPlacer.LOGGER.error("Failed to save config file!", e);
@@ -138,11 +152,22 @@ public class BlockPlacerConfig {
             if (root.has(ACTIVE_PRESET_KEY)) {
                 activePreset = root.get(ACTIVE_PRESET_KEY).getAsString();
             }
+            saveMode = root.has(SAVE_MODE_KEY) ? parseSaveMode(root.get(SAVE_MODE_KEY).getAsString()) : SaveMode.ON_CLOSE;
         } catch (IOException | RuntimeException e) {
             RandomBlockPlacer.LOGGER.error("Failed to load config file!", e);
             selectedBlocks.clear();
             presets.clear();
             activePreset = null;
+            saveMode = SaveMode.ON_CLOSE;
+        }
+    }
+
+    // Parses a save mode name, falling back to ON_CLOSE when unknown
+    private static SaveMode parseSaveMode(String name) {
+        try {
+            return SaveMode.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return SaveMode.ON_CLOSE;
         }
     }
 

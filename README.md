@@ -28,37 +28,48 @@ Link to the demo video on Youtube https://youtu.be/gzuZTy42xg0
 
 ### 1. Open the selection menu
 
-Press **B** to open the block selection menu.
+Press **B** to open the block selection menu. Your inventory is on the left, and a sidebar with two tabs, **Selection** and **Presets**, is on the right.
 
 ### 2. Select your blocks
 
-Click on the blocks you want to include in the random selection.
+Click a block in your inventory to add it to the selection. Click it again to remove it. Selected blocks are outlined in green.
 
 ### 3. Set custom probabilities (optional)
 
-Hold **Shift** and click a selected block.
+Every block starts with a weight of 100. To change it, **Shift+click** the block in your inventory, or click its row in the **Selection** tab. Type the new weight and press **Enter**. A weight of 0 removes the block.
 
-A small input field will appear where you can enter its weight/probability.
+The Selection tab shows each block's chance of being placed.
 
-Press **Enter** to confirm the value.
+**Clear selection** at the bottom of the tab removes every block from the selection. Your presets are not affected.
 
-### 4. Save your configuration
+### 4. Enable Random Placement
 
-Click the green **S** button to save your selection.
+Click the **Placement: ON/OFF** button at the top of the menu, or press **J** at any time.
 
-### 5. Enable Random Placement
-
-Close the menu and press **J** to enable or disable Random Block Placement.
-
-Now simply place blocks as usual!
+Close the menu and place blocks as usual!
 
 ---
 
-## Reset
+## Presets
 
-Want to start over?
+The **Presets** tab lets you save and reuse selections:
 
-Click the red **R** button in the menu to clear your current selection. Don't forget to save with de Save button
+- **Create**: type a name and click Create to save the current selection as a new preset.
+- **Load**: click a preset to select it, then click Load (or double-click it) to replace the current selection with it.
+- **Overwrite with selection**: replaces the blocks of the selected preset with the current selection.
+- **Delete**: deletes the selected preset.
+
+Overwrite and Delete ask you to click a second time to confirm. Hover a preset to preview its blocks.
+
+The top of the tab shows which preset is loaded, and marks it as **(modified)** when the selection has changed since.
+
+---
+
+## Saving
+
+By default, your selection is saved automatically when you close the menu (with **Done** or **Esc**).
+
+If you prefer to save manually, open the settings with the **⚙** button and set **Save changes** to **Manually**. The menu then shows **Cancel** and **Apply** buttons, and closing it without applying discards your changes.
 
 ---
 

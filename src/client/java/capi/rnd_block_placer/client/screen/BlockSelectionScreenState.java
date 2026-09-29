@@ -1,6 +1,5 @@
 package capi.rnd_block_placer.client.screen;
 
-import capi.rnd_block_placer.client.blockPlacer.BlockPlacer;
 import capi.rnd_block_placer.client.config.BlockPlacerConfig;
 import net.minecraft.resources.Identifier;
 
@@ -8,30 +7,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-// Mutable state for the block selection screen, isolated from the persisted config until "Save" is pressed
+// Working copy of the selection and loaded preset, isolated from the persisted config until applied
 public class BlockSelectionScreenState {
-    // Working copy of the block→weight map (not yet saved)
+    // Working copy of the block→weight map (not yet applied)
     private final Map<Identifier, Integer> workingWeights = new HashMap<>();
-    // Working copy of the enabled flag (not yet saved)
-    private boolean workingEnableRndPlacement = false;
+    // Name of the preset the working selection was loaded from, or null
+    private String activePreset;
 
-    // Initializes the working state from the current BlockPlacer config
-    public void init() {
-        workingEnableRndPlacement = BlockPlacer.INSTANCE.isEnabled();
-        workingWeights.clear();
-        workingWeights.putAll(BlockPlacerConfig.INSTANCE.getSelectedBlocks());
-    }
-
-    // Resets the working state to defaults (empty selection, disabled)
-    public void reset() {
-        workingWeights.clear();
-        workingEnableRndPlacement = false;
+    // Initializes the working state from the current config
+    public BlockSelectionScreenState() {
+        BlockPlacerConfig config = BlockPlacerConfig.INSTANCE;
+        workingWeights.putAll(config.getSelectedBlocks());
+        activePreset = config.getActivePreset();
     }
 
     // Returns whether the working selection is empty
     public boolean isEmpty() {
         return workingWeights.isEmpty();
+    }
+
+    // Returns the number of selected blocks
+    public int size() {
+        return workingWeights.size();
     }
 
     // Returns whether the given block is currently selected
@@ -63,10 +62,36 @@ public class BlockSelectionScreenState {
         workingWeights.remove(id);
     }
 
-    // Replaces the entire working selection with a new map (used when loading a preset)
-    public void setWeights(Map<Identifier, Integer> weights) {
+    // Empties the working selection; the loaded preset itself is left untouched
+    public void clear() {
         workingWeights.clear();
-        workingWeights.putAll(weights);
+    }
+
+    // Replaces the working selection with the named preset and marks it as loaded
+    public void loadPreset(String name) {
+        Map<Identifier, Integer> preset = BlockPlacerConfig.INSTANCE.getPreset(name);
+        if (preset == null) {
+            return;
+        }
+        workingWeights.clear();
+        workingWeights.putAll(preset);
+        activePreset = name;
+    }
+
+    // Returns the name of the loaded preset, or null
+    public String getActivePreset() {
+        return activePreset;
+    }
+
+    // Marks the named preset as loaded, or none when null
+    public void setActivePreset(String name) {
+        activePreset = name;
+    }
+
+    // Returns whether the working selection differs from the loaded preset's blocks
+    public boolean isActivePresetModified() {
+        Map<Identifier, Integer> preset = activePreset == null ? null : BlockPlacerConfig.INSTANCE.getPreset(activePreset);
+        return preset != null && !preset.equals(workingWeights);
     }
 
     // Returns the sum of all working weights
@@ -78,20 +103,40 @@ public class BlockSelectionScreenState {
         return total;
     }
 
-    // Returns working weights sorted by weight descending, for display
+    // Returns the given weight as a percentage of the total working weight
+    public int percentOf(int weight) {
+        int total = totalWeight();
+        return total <= 0 ? 0 : weight * 100 / total;
+    }
+
+    // Returns working weights sorted by weight descending, ties broken by identifier
     public List<Map.Entry<Identifier, Integer>> weightsSortedByDesc() {
         List<Map.Entry<Identifier, Integer>> sorted = new ArrayList<>(workingWeights.entrySet());
-        sorted.sort(Map.Entry.<Identifier, Integer>comparingByValue().reversed());
+        sorted.sort(Map.Entry.<Identifier, Integer>comparingByValue().reversed()
+                .thenComparing(entry -> entry.getKey().toString()));
         return sorted;
     }
 
-    // Returns a copy of the working selection, for saving to the config
+    // Returns a copy of the working selection
     public Map<Identifier, Integer> copyWeights() {
         return new HashMap<>(workingWeights);
     }
 
-    // Returns whether random placement is enabled in the working state
-    public boolean isRndPlacementEnabled() {
-        return workingEnableRndPlacement;
+    // Returns whether the working state differs from what is saved in the config
+    public boolean isDirty() {
+        BlockPlacerConfig config = BlockPlacerConfig.INSTANCE;
+        return !workingWeights.equals(config.getSelectedBlocks())
+                || !Objects.equals(activePreset, config.getActivePreset());
+    }
+
+    // Writes the working state to the config and saves it to disk
+    public void apply() {
+        BlockPlacerConfig config = BlockPlacerConfig.INSTANCE;
+        if (activePreset != null && config.getPreset(activePreset) == null) {
+            activePreset = null;
+        }
+        config.setSelectedBlocks(workingWeights);
+        config.setActivePreset(activePreset);
+        config.save();
     }
 }
