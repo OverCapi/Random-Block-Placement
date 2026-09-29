@@ -90,8 +90,8 @@ public final class RandomBlockSelector {
         return missing;
     }
 
-    // Builds the warning message listing missing materials
-    public static Component missingBlocksMessage(Set<Identifier> missing) {
+    // Builds a chat message whose argument lists the names of the given blocks
+    public static Component missingBlocksMessage(String translationKey, Set<Identifier> missing) {
         StringBuilder names = new StringBuilder();
         boolean first = true;
         for (Identifier id : missing) {
@@ -102,6 +102,6 @@ public final class RandomBlockSelector {
                 names.append(ref.value().getName(stack).getString());
             });
         }
-        return Component.translatable("message.rnd-block-placer.missing_materials", names.toString());
+        return Component.translatable(translationKey, names.toString());
     }
 }

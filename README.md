@@ -67,11 +67,15 @@ The top of the panel shows which preset is loaded, and marks it as **(modified)*
 
 ---
 
-## Saving
+## Settings
 
-By default, your selection is saved automatically when you close the menu (with **Done** or **Esc**).
+Open the settings with the **⚙** button at the top of the menu.
 
-If you prefer to save manually, open the settings with the **⚙** button and set **Save changes** to **Manually**. The menu then shows **Cancel** and **Apply** buttons, and closing it without applying discards your changes.
+| Setting | Options |
+|---------|---------|
+| **Save changes** | **On close** (default): your selection is saved automatically when you close the menu (with **Done**, **Esc** or **B**). **Manually**: the menu shows **Cancel** and **Apply** buttons, and closing it without applying discards your changes. |
+| **Missing blocks** | **Continue** (default): when a selected block runs out, placement goes on with the blocks you still have, and you are warned once. It turns off only when none are left. **Continue (quiet)**: same, without the warning. **Turn off**: placement stops as soon as one block is missing. |
+| **HUD position** | Where the "Random placement" indicator is shown: top center, top left, top right, above the hotbar, or hidden. It also shows the loaded preset's name. |
 
 ---
 

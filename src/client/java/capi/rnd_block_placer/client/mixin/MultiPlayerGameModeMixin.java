@@ -67,9 +67,7 @@ public class MultiPlayerGameModeMixin {
 		}
 
 		Set<Identifier> missingBlocks = RandomBlockSelector.missingBlocks(player.getInventory(), blockPlacerConfig);
-		if (!missingBlocks.isEmpty()) {
-			player.sendSystemMessage(RandomBlockSelector.missingBlocksMessage(missingBlocks));
-			BlockPlacer.INSTANCE.disable();
+		if (!BlockPlacer.INSTANCE.canContinueWithout(missingBlocks, player)) {
 			return;
 		}
 

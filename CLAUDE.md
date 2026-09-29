@@ -38,10 +38,10 @@ State between HEAD and RETURN is kept in `@Unique rbp$*` fields. Mixin members u
 `RandomBlockSelector` holds the selection logic and does not touch game state. It scans inventory slots `0..INVENTORY_SIZE`, keeps one slot per selected item id, and picks one with a cumulative-weight roll.
 
 ### Singletons / state
-- `BlockPlacer.INSTANCE`: the enabled/disabled toggle. It is in memory only and is not persisted.
+- `BlockPlacer.INSTANCE`: the enabled/disabled toggle. It is in memory only and is not persisted. `canContinueWithout(missing, player)` applies the `MissingBlockMode` setting: in CONTINUE mode it warns once per missing block and keeps placing with the rest (CONTINUE_QUIET skips the warning), and it turns placement off when nothing is left.
 - `BlockPlacerConfig.INSTANCE`: selected blocks (`Identifier → weight`, default weight 100), named presets, and the active preset. It is persisted as JSON by Gson to `<configDir>/rnd-block-placer.json`. It is loaded in `RandomBlockPlacerClient.onInitializeClient`, and saved explicitly with `save()`.
 - `KeyBindings`: B opens `BlockSelectionScreen`, and J toggles `BlockPlacer`. Both are polled on `ClientTickEvents.END_CLIENT_TICK`.
-- `HudRndBlockPlacer` shows the enabled indicator.
+- `HudRndBlockPlacer` shows the enabled indicator with the loaded preset name. Its position comes from the `HudPosition` setting.
 
 ### Selection screen (`client/screen`)
 `BlockSelectionScreen` is built from vanilla widgets (`Button`, `CycleButton`, `EditBox`, `Tooltip`). It shows three columns side by side: the Selection panel, the clickable inventory, and the Presets panel.
@@ -56,7 +56,7 @@ State between HEAD and RETURN is kept in `@Unique rbp$*` fields. Mixin members u
 - Input is routed in this order: vanilla widgets first, then the visible panels' lists, then inventory slot clicks.
 - `BlockSelectionScreenConstants`: all layout sizes and colors. Put new layout numbers here.
 - `PanelStyle` draws the shared look (panels, panel titles, header title). Every screen of the mod uses it.
-- `SettingsScreen` uses the same header, panel and footer structure. To add a setting, append a `SettingRow(label, description, control)` in `init()`. The panel height and control positions are computed from the rows.
+- `SettingsScreen` uses the same header, panel and footer structure. Enum settings implement `config/TranslatableOption`: labels and tooltips come from `<prefix>.<value>` and `<prefix>.<value>.tooltip`, and the row description from `<prefix>.description`. To add one, add the field to `BlockPlacerConfig` (read it with `parseEnum`) and call `addOptionRow(values, current, setter)` in `init()`. The panel height and control positions are computed from the rows.
 
 ### Resources
 User-facing strings are translation keys in `src/client/resources/assets/rnd-block-placer/lang/en_us.json`, for example `button.rnd-block-placer.*`, `tooltip.rnd-block-placer.*`, and `label.rnd-block-placer.*`. The screen uses no custom textures.

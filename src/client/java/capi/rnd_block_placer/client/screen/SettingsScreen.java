@@ -1,7 +1,10 @@
 package capi.rnd_block_placer.client.screen;
 
 import capi.rnd_block_placer.client.config.BlockPlacerConfig;
+import capi.rnd_block_placer.client.config.HudPosition;
+import capi.rnd_block_placer.client.config.MissingBlockMode;
 import capi.rnd_block_placer.client.config.SaveMode;
+import capi.rnd_block_placer.client.config.TranslatableOption;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -14,6 +17,7 @@ import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static capi.rnd_block_placer.client.screen.BlockSelectionScreenConstants.*;
 
@@ -42,12 +46,11 @@ public class SettingsScreen extends Screen {
 
     @Override
     protected void init() {
+        BlockPlacerConfig config = BlockPlacerConfig.INSTANCE;
         rows.clear();
-        rows.add(new SettingRow(
-                Component.translatable("options.rnd-block-placer.save_mode"),
-                Component.translatable("options.rnd-block-placer.save_mode.description"),
-                saveModeButton()
-        ));
+        addOptionRow(SaveMode.values(), config.getSaveMode(), config::setSaveMode);
+        addOptionRow(MissingBlockMode.values(), config.getMissingBlockMode(), config::setMissingBlockMode);
+        addOptionRow(HudPosition.values(), config.getHudPosition(), config::setHudPosition);
 
         int panelWidth = Math.min(PANEL_MAX_WIDTH, width - 2 * SCREEN_MARGIN);
         int textWidth = textWidth(panelWidth);
@@ -78,18 +81,20 @@ public class SettingsScreen extends Screen {
                 .build());
     }
 
-    // "Save changes": on close / manually
-    private CycleButton<SaveMode> saveModeButton() {
-        BlockPlacerConfig config = BlockPlacerConfig.INSTANCE;
-        return CycleButton.builder(SaveMode::label, config.getSaveMode())
-                .withValues(SaveMode.values())
-                .withTooltip(mode -> Tooltip.create(mode.description()))
+    // Adds a row for an enum setting: label and description from its translation prefix, and a cycle
+    // button that saves the config on every change
+    private <T extends TranslatableOption> void addOptionRow(T[] values, T current, Consumer<T> setter) {
+        String prefix = current.translationPrefix();
+        Component label = Component.translatable(prefix);
+        CycleButton<T> button = CycleButton.builder(TranslatableOption::label, current)
+                .withValues(values)
+                .withTooltip(value -> Tooltip.create(value.description()))
                 .displayOnlyValue()
-                .create(0, 0, CONTROL_WIDTH, CONTROL_HEIGHT, Component.translatable("options.rnd-block-placer.save_mode"),
-                        (button, mode) -> {
-                            config.setSaveMode(mode);
-                            config.save();
-                        });
+                .create(0, 0, CONTROL_WIDTH, CONTROL_HEIGHT, label, (cycleButton, value) -> {
+                    setter.accept(value);
+                    BlockPlacerConfig.INSTANCE.save();
+                });
+        rows.add(new SettingRow(label, Component.translatable(prefix + ".description"), button));
     }
 
     // Width left for a row's label and description, beside its control

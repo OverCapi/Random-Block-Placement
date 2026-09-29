@@ -70,6 +70,30 @@
 	"options.rnd-block-placer.save_mode.manual": "Manually",
 	"options.rnd-block-placer.save_mode.manual.tooltip": "Changes are only saved when you click Apply. Closing the screen discards them.",
 
-	"hud.rnd-block-placer.enabled": "§aENABLE",
-	"message.rnd-block-placer.missing_materials": "§c[RBP] Missing materials : §e%s"
+	"options.rnd-block-placer.missing_block": "Missing blocks",
+	"options.rnd-block-placer.missing_block.description": "What happens when a selected block runs out of your inventory.",
+	"options.rnd-block-placer.missing_block.continue": "Continue",
+	"options.rnd-block-placer.missing_block.continue.tooltip": "Keep placing with the blocks you still have. You are warned once per missing block. Placement turns off only when none are left.",
+	"options.rnd-block-placer.missing_block.continue_quiet": "Continue (quiet)",
+	"options.rnd-block-placer.missing_block.continue_quiet.tooltip": "Keep placing with the blocks you still have, without any chat warning. You are still told when placement turns off because none are left.",
+	"options.rnd-block-placer.missing_block.disable": "Turn off",
+	"options.rnd-block-placer.missing_block.disable.tooltip": "Turn random placement off as soon as one selected block is missing.",
+
+	"options.rnd-block-placer.hud_position": "HUD position",
+	"options.rnd-block-placer.hud_position.description": "Where the random placement indicator is shown while it is on.",
+	"options.rnd-block-placer.hud_position.top_center": "Top center",
+	"options.rnd-block-placer.hud_position.top_center.tooltip": "Show the indicator at the top of the screen, centered.",
+	"options.rnd-block-placer.hud_position.top_left": "Top left",
+	"options.rnd-block-placer.hud_position.top_left.tooltip": "Show the indicator in the top-left corner.",
+	"options.rnd-block-placer.hud_position.top_right": "Top right",
+	"options.rnd-block-placer.hud_position.top_right.tooltip": "Show the indicator in the top-right corner.",
+	"options.rnd-block-placer.hud_position.above_hotbar": "Above hotbar",
+	"options.rnd-block-placer.hud_position.above_hotbar.tooltip": "Show the indicator just above the hotbar.",
+	"options.rnd-block-placer.hud_position.hidden": "Hidden",
+	"options.rnd-block-placer.hud_position.hidden.tooltip": "Do not show the indicator.",
+
+	"hud.rnd-block-placer.enabled": "Random placement",
+	"hud.rnd-block-placer.modified": " (modified)",
+	"message.rnd-block-placer.missing_materials": "§c[RBP] Missing materials: §e%s§c. Random placement turned off.",
+	"message.rnd-block-placer.missing_continue": "§6[RBP] Out of §e%s§6, continuing with the other blocks."
 }

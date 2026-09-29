@@ -27,6 +27,8 @@ public class BlockPlacerConfig {
     private static final String PRESETS_KEY = "presets";
     private static final String ACTIVE_PRESET_KEY = "activePreset";
     private static final String SAVE_MODE_KEY = "saveMode";
+    private static final String MISSING_BLOCK_MODE_KEY = "missingBlockMode";
+    private static final String HUD_POSITION_KEY = "hudPosition";
     // Pretty-printing Gson instance for JSON read/write
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
@@ -38,6 +40,10 @@ public class BlockPlacerConfig {
     private String activePreset = null;
     // When the selection screen writes its changes to the config
     private SaveMode saveMode = SaveMode.ON_CLOSE;
+    // What placement does when a selected block runs out
+    private MissingBlockMode missingBlockMode = MissingBlockMode.CONTINUE;
+    // Where the HUD indicator is drawn
+    private HudPosition hudPosition = HudPosition.TOP_CENTER;
 
     private BlockPlacerConfig() {}
 
@@ -111,6 +117,24 @@ public class BlockPlacerConfig {
         this.saveMode = saveMode;
     }
 
+    // Returns what placement does when a selected block runs out
+    public MissingBlockMode getMissingBlockMode() {
+        return missingBlockMode;
+    }
+
+    public void setMissingBlockMode(MissingBlockMode missingBlockMode) {
+        this.missingBlockMode = missingBlockMode;
+    }
+
+    // Returns where the HUD indicator is drawn
+    public HudPosition getHudPosition() {
+        return hudPosition;
+    }
+
+    public void setHudPosition(HudPosition hudPosition) {
+        this.hudPosition = hudPosition;
+    }
+
     // Persists the current selection to the config file as JSON
     public void save() {
         try {
@@ -125,6 +149,8 @@ public class BlockPlacerConfig {
                 root.addProperty(ACTIVE_PRESET_KEY, activePreset);
             }
             root.addProperty(SAVE_MODE_KEY, saveMode.name());
+            root.addProperty(MISSING_BLOCK_MODE_KEY, missingBlockMode.name());
+            root.addProperty(HUD_POSITION_KEY, hudPosition.name());
             Files.writeString(getConfigPath(), GSON.toJson(root));
         } catch (IOException e) {
             RandomBlockPlacer.LOGGER.error("Failed to save config file!", e);
@@ -152,22 +178,29 @@ public class BlockPlacerConfig {
             if (root.has(ACTIVE_PRESET_KEY)) {
                 activePreset = root.get(ACTIVE_PRESET_KEY).getAsString();
             }
-            saveMode = root.has(SAVE_MODE_KEY) ? parseSaveMode(root.get(SAVE_MODE_KEY).getAsString()) : SaveMode.ON_CLOSE;
+            saveMode = parseEnum(root, SAVE_MODE_KEY, SaveMode.ON_CLOSE);
+            missingBlockMode = parseEnum(root, MISSING_BLOCK_MODE_KEY, MissingBlockMode.CONTINUE);
+            hudPosition = parseEnum(root, HUD_POSITION_KEY, HudPosition.TOP_CENTER);
         } catch (IOException | RuntimeException e) {
             RandomBlockPlacer.LOGGER.error("Failed to load config file!", e);
             selectedBlocks.clear();
             presets.clear();
             activePreset = null;
             saveMode = SaveMode.ON_CLOSE;
+            missingBlockMode = MissingBlockMode.CONTINUE;
+            hudPosition = HudPosition.TOP_CENTER;
         }
     }
 
-    // Parses a save mode name, falling back to ON_CLOSE when unknown
-    private static SaveMode parseSaveMode(String name) {
+    // Reads an enum setting by name, falling back to the default when missing or unknown
+    private static <E extends Enum<E>> E parseEnum(JsonObject root, String key, E fallback) {
+        if (!root.has(key)) {
+            return fallback;
+        }
         try {
-            return SaveMode.valueOf(name);
+            return Enum.valueOf(fallback.getDeclaringClass(), root.get(key).getAsString());
         } catch (IllegalArgumentException e) {
-            return SaveMode.ON_CLOSE;
+            return fallback;
         }
     }
 
