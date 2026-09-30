@@ -8,7 +8,7 @@ import capi.rnd_block_placer.client.screen.tab.PresetsTab;
 import capi.rnd_block_placer.client.screen.tab.SelectionTab;
 import capi.rnd_block_placer.client.screen.tab.SidebarTab;
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
@@ -188,8 +188,8 @@ public class BlockSelectionScreen extends Screen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor extract, int mx, int my, float delta) {
-        super.extractBackground(extract, mx, my, delta);
+    public void renderBackground(GuiGraphics extract, int mx, int my, float delta) {
+        super.renderBackground(extract, mx, my, delta);
         PanelStyle.drawPanel(extract, layout.inventoryPanel());
         PanelStyle.drawPanel(extract, layout.rightPanel());
         if (layout.split()) {
@@ -198,9 +198,9 @@ public class BlockSelectionScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor extract, int mx, int my, float delta) {
+    public void render(GuiGraphics extract, int mx, int my, float delta) {
         updateWidgets();
-        super.extractRenderState(extract, mx, my, delta);
+        super.render(extract, mx, my, delta);
 
         PanelStyle.drawHeaderTitle(extract, font, layout.header(), title);
 
@@ -218,7 +218,7 @@ public class BlockSelectionScreen extends Screen {
 
         if (applyButton != null && state.isDirty()) {
             ScreenRectangle footer = layout.footer();
-            extract.text(font, Component.translatable("label.rnd-block-placer.unsaved"),
+            extract.drawString(font, Component.translatable("label.rnd-block-placer.unsaved"),
                     footer.left() + 2, footer.top() + (FOOTER_HEIGHT - font.lineHeight) / 2 + 1, TEXT_WARNING_COLOR);
         }
     }

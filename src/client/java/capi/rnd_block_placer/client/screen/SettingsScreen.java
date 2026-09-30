@@ -5,7 +5,7 @@ import capi.rnd_block_placer.client.config.HudPosition;
 import capi.rnd_block_placer.client.config.MissingBlockMode;
 import capi.rnd_block_placer.client.config.SaveMode;
 import capi.rnd_block_placer.client.config.TranslatableOption;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
@@ -107,14 +107,14 @@ public class SettingsScreen extends Screen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor extract, int mx, int my, float delta) {
-        super.extractBackground(extract, mx, my, delta);
+    public void renderBackground(GuiGraphics extract, int mx, int my, float delta) {
+        super.renderBackground(extract, mx, my, delta);
         PanelStyle.drawPanel(extract, panel);
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor extract, int mx, int my, float delta) {
-        super.extractRenderState(extract, mx, my, delta);
+    public void render(GuiGraphics extract, int mx, int my, float delta) {
+        super.render(extract, mx, my, delta);
         PanelStyle.drawHeaderTitle(extract, font, header, Component.translatable("screen.rnd-block-placer.title"));
         PanelStyle.drawPanelTitle(extract, font, panel, title);
 
@@ -129,8 +129,8 @@ public class SettingsScreen extends Screen {
             }
             int rowHeight = rowHeight(row, textWidth);
             int textTop = y + (rowHeight - LABEL_HEIGHT - font.wordWrapHeight(row.description(), textWidth)) / 2;
-            extract.text(font, row.label(), inner.left(), textTop, TEXT_COLOR);
-            extract.textWithWordWrap(font, row.description(), inner.left(), textTop + LABEL_HEIGHT, textWidth, TEXT_MUTED_COLOR);
+            extract.drawString(font, row.label(), inner.left(), textTop, TEXT_COLOR);
+            extract.drawWordWrap(font, row.description(), inner.left(), textTop + LABEL_HEIGHT, textWidth, TEXT_MUTED_COLOR);
             y += rowHeight + ROW_SPACING;
         }
     }

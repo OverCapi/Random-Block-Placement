@@ -2,7 +2,7 @@ package capi.rnd_block_placer.client.screen.tab;
 
 import capi.rnd_block_placer.client.screen.BlockSelectionScreenState;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -163,12 +163,12 @@ public class SelectionTab extends SidebarTab {
     }
 
     @Override
-    public void render(GuiGraphicsExtractor extract, int mx, int my) {
+    public void render(GuiGraphics extract, int mx, int my) {
         ScreenRectangle list = listArea();
         List<Map.Entry<Identifier, Integer>> entries = state.weightsSortedByDesc();
 
         if (entries.isEmpty()) {
-            extract.textWithWordWrap(font, Component.translatable("label.rnd-block-placer.selection.empty"),
+            extract.drawWordWrap(font, Component.translatable("label.rnd-block-placer.selection.empty"),
                     list.left(), list.top() + 2, list.width(), TEXT_MUTED_COLOR);
         }
 
@@ -187,21 +187,21 @@ public class SelectionTab extends SidebarTab {
             }
 
             ItemStack stack = new ItemStack(BuiltInRegistries.ITEM.getValue(id));
-            extract.item(stack, x + 1, y + 1);
+            extract.renderItem(stack, x + 1, y + 1);
 
             int textY = y + (SIDEBAR_ROW_HEIGHT - font.lineHeight) / 2 + 1;
             int removeX = x + rowWidth - REMOVE_WIDTH;
             boolean overRemove = i == hovered && mx >= removeX;
-            extract.text(font, "✕", removeX + 2, textY, overRemove ? TEXT_REMOVE_COLOR : TEXT_MUTED_COLOR);
+            extract.drawString(font, "✕", removeX + 2, textY, overRemove ? TEXT_REMOVE_COLOR : TEXT_MUTED_COLOR);
 
             Component summary = Component.translatable("label.rnd-block-placer.weight_summary",
                     state.percentOf(entry.getValue()));
             int summaryX = removeX - 2 - font.width(summary);
-            extract.text(font, summary, summaryX, textY, TEXT_COLOR);
+            extract.drawString(font, summary, summaryX, textY, TEXT_COLOR);
 
             int nameX = x + 19;
             String name = truncate(stack.getHoverName().getString(), summaryX - 4 - nameX);
-            extract.text(font, name, nameX, textY, TEXT_MUTED_COLOR);
+            extract.drawString(font, name, nameX, textY, TEXT_MUTED_COLOR);
 
             if (i == hovered) {
                 extract.setTooltipForNextFrame(font, Component.translatable(overRemove
@@ -214,9 +214,9 @@ public class SelectionTab extends SidebarTab {
     }
 
     // Draws the "Chance: X" label while editing, or a hint on how to edit otherwise
-    private void renderEditorLabel(GuiGraphicsExtractor extract) {
+    private void renderEditorLabel(GuiGraphics extract) {
         if (editingId == null) {
-            extract.textWithWordWrap(font, Component.translatable("hint.rnd-block-placer.edit_weight"),
+            extract.drawWordWrap(font, Component.translatable("hint.rnd-block-placer.edit_weight"),
                     editorArea.left(), editorArea.top() + 2, editorArea.width(), TEXT_MUTED_COLOR);
             return;
         }
@@ -224,7 +224,7 @@ public class SelectionTab extends SidebarTab {
         int prefixWidth = font.width(Component.translatable("label.rnd-block-placer.weight_for", ""));
         Component label = Component.translatable("label.rnd-block-placer.weight_for",
                 truncate(name, editorArea.width() - prefixWidth));
-        extract.text(font, label, editorArea.left(), editorArea.top(), TEXT_COLOR);
+        extract.drawString(font, label, editorArea.left(), editorArea.top(), TEXT_COLOR);
     }
 
     @Override

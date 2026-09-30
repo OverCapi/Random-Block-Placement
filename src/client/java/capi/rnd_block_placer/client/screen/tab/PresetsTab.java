@@ -4,7 +4,7 @@ import capi.rnd_block_placer.client.config.BlockPlacerConfig;
 import capi.rnd_block_placer.client.screen.BlockSelectionScreenState;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -215,13 +215,13 @@ public class PresetsTab extends SidebarTab {
     }
 
     @Override
-    public void render(GuiGraphicsExtractor extract, int mx, int my) {
+    public void render(GuiGraphics extract, int mx, int my) {
         renderStatus(extract);
 
         ScreenRectangle list = listArea();
         List<String> names = presetNames();
         if (names.isEmpty()) {
-            extract.textWithWordWrap(font, Component.translatable("label.rnd-block-placer.preset.none"),
+            extract.drawWordWrap(font, Component.translatable("label.rnd-block-placer.preset.none"),
                     list.left(), list.top() + 2, list.width(), TEXT_MUTED_COLOR);
         }
 
@@ -241,7 +241,7 @@ public class PresetsTab extends SidebarTab {
 
             int textY = y + (SIDEBAR_ROW_HEIGHT - font.lineHeight) / 2 + 1;
             int color = name.equals(active) ? TEXT_ACTIVE_COLOR : TEXT_COLOR;
-            extract.text(font, truncate(name, rowWidth - 8), x + 4, textY, color);
+            extract.drawString(font, truncate(name, rowWidth - 8), x + 4, textY, color);
 
             if (i == hovered) {
                 extract.setComponentTooltipForNextFrame(font, previewLines(name), mx, my);
@@ -251,10 +251,10 @@ public class PresetsTab extends SidebarTab {
     }
 
     // Draws which preset the selection was loaded from, and whether it has been modified since
-    private void renderStatus(GuiGraphicsExtractor extract) {
+    private void renderStatus(GuiGraphics extract) {
         String active = state.getActivePreset();
         if (active == null || BlockPlacerConfig.INSTANCE.getPreset(active) == null) {
-            extract.text(font, Component.translatable("label.rnd-block-placer.preset.not_loaded"),
+            extract.drawString(font, Component.translatable("label.rnd-block-placer.preset.not_loaded"),
                     area.left(), area.top(), TEXT_MUTED_COLOR);
             return;
         }
@@ -262,7 +262,7 @@ public class PresetsTab extends SidebarTab {
         String key = modified ? "label.rnd-block-placer.preset.loaded_modified" : "label.rnd-block-placer.preset.loaded";
         int prefixWidth = font.width(Component.translatable(key, ""));
         Component label = Component.translatable(key, truncate(active, area.width() - prefixWidth));
-        extract.text(font, label, area.left(), area.top(), modified ? TEXT_WARNING_COLOR : TEXT_ACTIVE_COLOR);
+        extract.drawString(font, label, area.left(), area.top(), modified ? TEXT_WARNING_COLOR : TEXT_ACTIVE_COLOR);
     }
 
     // Tooltip listing a preset's blocks with their share, heaviest first

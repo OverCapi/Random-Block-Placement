@@ -5,7 +5,7 @@ import capi.rnd_block_placer.client.blockPlacer.BlockPlacer;
 import capi.rnd_block_placer.client.screen.BlockSelectionScreen;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
@@ -23,10 +23,10 @@ public final class KeyBindings {
 
     // Keybinding: opens the block selection screen, and closes it when pressed again (default: B)
     private final KeyMapping openSelectionScreen =
-            KeyMappingHelper.registerKeyMapping(
+            KeyBindingHelper.registerKeyBinding(
                     new KeyMapping(
                             "key." + RandomBlockPlacer.MOD_ID + ".toggle_selection_screen",
-                            InputConstants.Type.KEYBOARD,
+                            InputConstants.Type.KEYSYM,
                             InputConstants.KEY_B,
                             CATEGORY
                     )
@@ -34,10 +34,10 @@ public final class KeyBindings {
 
     // Keybinding: toggles random block placement on/off (default: J)
     private final KeyMapping toggleBlockPlacement =
-            KeyMappingHelper.registerKeyMapping(
+            KeyBindingHelper.registerKeyBinding(
                     new KeyMapping(
                             "key." + RandomBlockPlacer.MOD_ID + ".toggle_block_placement",
-                            InputConstants.Type.KEYBOARD,
+                            InputConstants.Type.KEYSYM,
                             InputConstants.KEY_J,
                             CATEGORY
                     )

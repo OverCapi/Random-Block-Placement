@@ -2,7 +2,7 @@ package capi.rnd_block_placer.client.screen;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -33,7 +33,7 @@ public class InventoryGrid {
         return BuiltInRegistries.ITEM.getKey(stack.getItem());
     }
 
-    public void render(GuiGraphicsExtractor extract, SelectionLayout layout, LocalPlayer player, int mx, int my) {
+    public void render(GuiGraphics extract, SelectionLayout layout, LocalPlayer player, int mx, int my) {
         int size = layout.slotSize();
         int hoveredSlot = layout.slotAt(mx, my);
 
@@ -47,7 +47,7 @@ public class InventoryGrid {
                 boolean selected = id != null && state.containsWeight(id);
 
                 extract.fill(x, y, x + size, y + size, selected ? SLOT_SELECTED_COLOR : SLOT_COLOR);
-                extract.outline(x, y, size, size, selected ? SLOT_SELECTED_BORDER_COLOR : SLOT_BORDER_COLOR);
+                extract.renderOutline(x, y, size, size, selected ? SLOT_SELECTED_BORDER_COLOR : SLOT_BORDER_COLOR);
 
                 if (!stack.isEmpty()) {
                     drawIcon(extract, stack, x, y, size);
@@ -67,12 +67,12 @@ public class InventoryGrid {
         }
 
         int hintY = layout.hintY();
-        extract.text(font, Component.translatable("hint.rnd-block-placer.click"), layout.gridX(), hintY, TEXT_MUTED_COLOR);
-        extract.text(font, Component.translatable("hint.rnd-block-placer.shift_click"), layout.gridX(), hintY + 11, TEXT_MUTED_COLOR);
+        extract.drawString(font, Component.translatable("hint.rnd-block-placer.click"), layout.gridX(), hintY, TEXT_MUTED_COLOR);
+        extract.drawString(font, Component.translatable("hint.rnd-block-placer.shift_click"), layout.gridX(), hintY + 11, TEXT_MUTED_COLOR);
     }
 
     // Draws the item icon scaled up to fill the slot, centered on it
-    private void drawIcon(GuiGraphicsExtractor extract, ItemStack stack, int x, int y, int size) {
+    private void drawIcon(GuiGraphics extract, ItemStack stack, int x, int y, int size) {
         float scale = Math.max(1.0f, (size - 4) / 16.0f);
         float cx = x + size / 2.0f;
         float cy = y + size / 2.0f;
@@ -81,7 +81,7 @@ public class InventoryGrid {
         pose.translate(cx, cy);
         pose.scale(scale);
         pose.translate(-cx, -cy);
-        extract.item(stack, x + (size - 16) / 2, y + (size - 16) / 2);
+        extract.renderItem(stack, x + (size - 16) / 2, y + (size - 16) / 2);
         pose.popMatrix();
     }
 

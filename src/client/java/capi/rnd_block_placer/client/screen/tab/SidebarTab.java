@@ -1,7 +1,7 @@
 package capi.rnd_block_placer.client.screen.tab;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.input.KeyEvent;
@@ -33,7 +33,7 @@ public abstract class SidebarTab {
     public abstract void updateWidgets();
 
     // Draws the list and any custom content
-    public abstract void render(GuiGraphicsExtractor extract, int mx, int my);
+    public abstract void render(GuiGraphics extract, int mx, int my);
 
     // Handles a click on the list; returns true if consumed
     public abstract boolean mouseClicked(double mx, double my);
@@ -118,7 +118,7 @@ public abstract class SidebarTab {
     }
 
     // Draws a thin scrollbar on the right edge of the list when it overflows
-    protected void renderScrollbar(GuiGraphicsExtractor extract) {
+    protected void renderScrollbar(GuiGraphics extract) {
         if (maxScroll() == 0) {
             return;
         }

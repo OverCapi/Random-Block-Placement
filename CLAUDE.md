@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Random Block Placement (mod id `rnd-block-placer`) is a **client-side** Fabric mod for Minecraft 26.3. When enabled, each block placement swaps in a weighted-random block from the player's inventory. It must work on vanilla servers, so all behavior is done through normal client→server actions (hotbar slot changes and inventory swap clicks). It never uses custom packets or server-side logic.
+Random Block Placement (mod id `rnd-block-placer`) is a **client-side** Fabric mod for Minecraft 1.21.11 (this is the `mc/1.21.11` port branch; `main` targets 26.3). When enabled, each block placement swaps in a weighted-random block from the player's inventory. It must work on vanilla servers, so all behavior is done through normal client→server actions (hotbar slot changes and inventory swap clicks). It never uses custom packets or server-side logic.
 
-Toolchain: Java 25, Fabric Loom (`net.fabricmc.fabric-loom`), Fabric API. Versions live in `gradle.properties`. There is no test source set.
+Toolchain: Java 21, Fabric Loom with remapping (`net.fabricmc.fabric-loom-remap`, `modImplementation` dependencies), Fabric API. Versions live in `gradle.properties`. There is no test source set.
 
 ## Commands
 
@@ -16,7 +16,7 @@ Toolchain: Java 25, Fabric Loom (`net.fabricmc.fabric-loom`), Fabric API. Versio
 ./gradlew genSources     # decompile Minecraft sources for browsing MC APIs
 ```
 
-CI (`.github/workflows/build.yml`) runs `./gradlew build` on pushes and PRs to `main`. Pushing a `v*` tag triggers `release.yml`, which builds and attaches `build/libs/*.jar` to a GitHub release. Bump `mod_version` in `gradle.properties` before tagging.
+CI (`.github/workflows/build.yml`) runs `./gradlew build` on pushes and PRs to `main` and `mc/1.21.11`, with Java 21 on this branch. Pushing a `v*` tag triggers `release.yml`, which builds and attaches `build/libs/*.jar` to a GitHub release. Bump `mod_version` in `gradle.properties` before tagging.
 
 ## Architecture
 
@@ -24,13 +24,13 @@ Loom `splitEnvironmentSourceSets()` is on, so there are two source sets:
 - `src/main`: only the common `ModInitializer` (`RandomBlockPlacer`, which holds `MOD_ID` and `LOGGER`), plus `fabric.mod.json` and an empty common mixin config.
 - `src/client`: all real functionality. Client code may reference `main`, but not the reverse.
 
-Minecraft 26.x ships unobfuscated with Mojang names, so APIs are used directly (for example `MultiPlayerGameMode`, `GuiGraphicsExtractor`, `Screen.extractRenderState`). There is no mappings layer.
+Minecraft 1.21.11 is obfuscated, so the build uses the official Mojang mappings (`loom.officialMojangMappings()`). Code is written against Mojang names (for example `MultiPlayerGameMode`, `GuiGraphics`, `Screen.render`). When porting changes from `main` (26.x), rename `GuiGraphicsExtractor` → `GuiGraphics`, `extractRenderState`/`extractBackground` → `render`/`renderBackground`, `text`/`textWithWordWrap`/`outline`/`item` → `drawString`/`drawWordWrap`/`renderOutline`/`renderItem`, `ContainerInput`/`handleContainerInput` → `ClickType`/`handleInventoryMouseClick`, `KeyMappingHelper` → `KeyBindingHelper`, and `sendSystemMessage` → `displayClientMessage(..., false)`.
 
 ### Placement flow (the core mechanic)
 `client/mixin/MultiPlayerGameModeMixin` injects at HEAD and RETURN of `MultiPlayerGameMode.useItemOn`:
 1. **HEAD**: if `BlockPlacer.INSTANCE` is enabled and the hand is the main hand, check for missing selected blocks. If any are missing, send a chat warning and auto-disable. Otherwise pick a slot through `RandomBlockSelector`.
    - If the chosen slot is in the hotbar, it calls `setSelectedSlot`.
-   - If it is in the main inventory, it runs a `ContainerInput.SWAP` through `handleContainerInput` into the current hotbar slot.
+   - If it is in the main inventory, it runs a `ClickType.SWAP` through `handleInventoryMouseClick` into the current hotbar slot.
 2. **RETURN**: undo the inventory swap if one happened, restore the original selected slot, and call `ensureHasSentCarriedItem` (exposed by `MultiPlayerGameModeAccessor`) to resync with the server.
 
 State between HEAD and RETURN is kept in `@Unique rbp$*` fields. Mixin members use the `rbp$` prefix.
@@ -51,7 +51,7 @@ State between HEAD and RETURN is kept in `@Unique rbp$*` fields. Mixin members u
 - The UI shows and edits **percentages**, but config and presets still store integer weights. `BlockSelectionScreenState.setPercent` rescales the other blocks to keep their proportions, storing weights in hundredths of a percent. `addBlock` gives a new block the average weight so it gets an even share.
 - Preset operations in `PresetsTab` (create, overwrite, delete) write to the config **immediately**. Only the selection and the loaded preset belong to the working state. Overwrite and delete need a second click to confirm (the `Armed` state).
 - `tab/SidebarTab` is the base class for `SelectionTab` and `PresetsTab`. It provides the scrollable fixed-height row list. Each tab creates its widgets in `init(area, addWidget)` and refreshes their labels and enabled state every frame in `updateWidgets()`. The screen loops over `visibleTabs()` (both panels when split, the active tab otherwise) for rendering and input.
-- `InventoryGrid` draws the slots and item tooltips. Panels are drawn in `extractBackground`, which runs in an earlier render stratum, so they stay behind the widgets.
+- `InventoryGrid` draws the slots and item tooltips. Panels are drawn in `renderBackground`, which runs in an earlier render stratum, so they stay behind the widgets.
 - The placement toggle acts directly on `BlockPlacer.INSTANCE`, like the J key. It is not part of the working state.
 - Input is routed in this order: vanilla widgets first, then the visible panels' lists, then inventory slot clicks.
 - `BlockSelectionScreenConstants`: all layout sizes and colors. Put new layout numbers here.

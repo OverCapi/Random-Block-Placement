@@ -18,7 +18,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -34,7 +34,7 @@ public class MultiPlayerGameModeMixin {
 	@Unique
 	private int rbp$originalSlot;
 
-	// Whether the swap involved an inventory slot (outside hotbar) via ContainerInput
+	// Whether the swap involved an inventory slot (outside hotbar) via ClickType
 	@Unique
 	private boolean rbp$invSwapped = false;
 
@@ -92,11 +92,11 @@ public class MultiPlayerGameModeMixin {
 
 		// If the block is in the main inventory, swap it with the current hotbar slot
 		MultiPlayerGameMode self = (MultiPlayerGameMode) (Object) this;
-		self.handleContainerInput(
+		self.handleInventoryMouseClick(
 				InventoryMenu.CONTAINER_ID,
 				chosenSlotEntry.slot(),
 				rbp$originalSlot,
-				ContainerInput.SWAP,
+				ClickType.SWAP,
 				player
 		);
 
@@ -123,11 +123,11 @@ public class MultiPlayerGameModeMixin {
 		// Swap back the inventory slot if one was used
 		if (rbp$invSwapped && rbp$invSlot != -1) {
 			MultiPlayerGameMode self = (MultiPlayerGameMode) (Object) this;
-			self.handleContainerInput(
+			self.handleInventoryMouseClick(
 				InventoryMenu.CONTAINER_ID,
 				rbp$invSlot,
 				rbp$originalSlot,
-				ContainerInput.SWAP,
+				ClickType.SWAP,
 				player
 			);
 		}

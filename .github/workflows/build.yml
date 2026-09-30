@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - main
+      - mc/1.21.11
 
   pull_request:
     branches:
       - main
+      - mc/1.21.11
 
 jobs:
   build:
@@ -19,7 +21,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          java-version: 25
+          java-version: 21
           distribution: temurin
 
       - name: Setup Gradle

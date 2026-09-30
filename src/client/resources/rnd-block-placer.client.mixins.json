@@ -1,7 +1,7 @@
 {
 	"required": true,
 	"package": "capi.rnd_block_placer.client.mixin",
-	"compatibilityLevel": "JAVA_25",
+	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"MultiPlayerGameModeMixin",
 		"MultiPlayerGameModeAccessor"

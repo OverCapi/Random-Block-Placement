@@ -41,7 +41,7 @@ public class HudRndBlockPlacer {
                         default -> (screenWidth - textWidth) / 2;
                     };
                     int y = position == HudPosition.ABOVE_HOTBAR ? screenHeight - ABOVE_HOTBAR_OFFSET : MARGIN;
-                    extract.text(mc.font, text, x, y, TEXT_COLOR);
+                    extract.drawString(mc.font, text, x, y, TEXT_COLOR);
                 }
         );
     }

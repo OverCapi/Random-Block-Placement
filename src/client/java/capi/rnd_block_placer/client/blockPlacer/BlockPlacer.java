@@ -55,7 +55,7 @@ public class BlockPlacer {
         BlockPlacerConfig config = BlockPlacerConfig.INSTANCE;
         boolean nothingLeft = missing.containsAll(config.getSelectedBlocksKey());
         if (nothingLeft || config.getMissingBlockMode() == MissingBlockMode.DISABLE) {
-            player.sendSystemMessage(RandomBlockSelector.missingBlocksMessage("message.rnd-block-placer.missing_materials", missing));
+            player.displayClientMessage(RandomBlockSelector.missingBlocksMessage("message.rnd-block-placer.missing_materials", missing), false);
             disable();
             return false;
         }
@@ -66,7 +66,7 @@ public class BlockPlacer {
         Set<Identifier> newlyMissing = new HashSet<>(missing);
         newlyMissing.removeAll(warnedMissing);
         if (!newlyMissing.isEmpty()) {
-            player.sendSystemMessage(RandomBlockSelector.missingBlocksMessage("message.rnd-block-placer.missing_continue", newlyMissing));
+            player.displayClientMessage(RandomBlockSelector.missingBlocksMessage("message.rnd-block-placer.missing_continue", newlyMissing), false);
             warnedMissing.addAll(newlyMissing);
         }
         return true;
