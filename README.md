@@ -9,7 +9,7 @@ Whether you're building organic structures, adding variation to walls, or creati
 ---
 
 ## Demo
-Link to the demo video on Youtube https://youtu.be/gzuZTy42xg0
+Link to the demo video on Youtube [https://www.youtube.com/watch?v=2N-Sqn60HzQ]
 ---
 
 ## Features
