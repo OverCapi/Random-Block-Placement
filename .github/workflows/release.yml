@@ -27,7 +27,11 @@ jobs:
       - name: Build
         run: ./gradlew build
 
+      - name: Extract release notes
+        run: awk -v v="${GITHUB_REF_NAME#v}" '/^## /{p = ($2 == v); next} p' CHANGELOG.md > release-notes.md
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: build/libs/*.jar
+          body_path: release-notes.md
