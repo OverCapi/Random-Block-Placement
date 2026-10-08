@@ -44,6 +44,15 @@ public class BlockSelectionScreenConstants {
     public static final int FOOTER_BUTTON_WIDTH = 90;
     public static final int HEADER_TOGGLE_WIDTH = 110;
 
+    // Quick preset wheel: a ring of slices around a center disc; the pointed slice pops outward
+    public static final int WHEEL_MAX_RADIUS = 90;
+    public static final float WHEEL_INNER_RATIO = 0.42f;
+    public static final int WHEEL_GAP = 3;
+    public static final int WHEEL_HOVER_GROW = 6;
+    public static final int WHEEL_DEAD_ZONE = 16;
+    public static final int WHEEL_HOVER_COLOR = 0xE01E4D1E;
+    public static final int WHEEL_ACTIVE_COLOR = 0xC0183018;
+
     // Panel colors
     public static final int PANEL_COLOR = 0xC0101010;
     public static final int PANEL_BORDER_COLOR = 0xFF555555;
