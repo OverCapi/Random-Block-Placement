@@ -17,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static capi.rnd_block_placer.client.screen.BlockSelectionScreenConstants.*;
@@ -31,6 +32,8 @@ public class SelectionTab extends SidebarTab {
 
     private final BlockSelectionScreenState state;
     private final Consumer<GuiEventListener> focus;
+    // Opens the player picker for a name and its block weights
+    private final BiConsumer<String, Map<Identifier, Integer>> share;
 
     // Block whose chance is being edited, and the percentage typed so far (kept across widget rebuilds)
     private Identifier editingId;
@@ -39,12 +42,15 @@ public class SelectionTab extends SidebarTab {
     private EditBox weightBox;
     private Button confirmButton;
     private Button clearButton;
+    private Button shareButton;
     private ScreenRectangle editorArea = ScreenRectangle.empty();
 
-    public SelectionTab(Font font, BlockSelectionScreenState state, Consumer<GuiEventListener> focus) {
+    public SelectionTab(Font font, BlockSelectionScreenState state, Consumer<GuiEventListener> focus,
+                        BiConsumer<String, Map<Identifier, Integer>> share) {
         super(font);
         this.state = state;
         this.focus = focus;
+        this.share = share;
     }
 
     @Override
@@ -72,14 +78,20 @@ public class SelectionTab extends SidebarTab {
                 .tooltip(Tooltip.create(Component.translatable("tooltip.rnd-block-placer.weight.confirm")))
                 .build();
 
+        int halfWidth = (area.width() - 2) / 2;
         clearButton = Button.builder(Component.translatable("button.rnd-block-placer.clear"), button -> clearSelection())
-                .bounds(area.left(), clearY, area.width(), SIDEBAR_BUTTON_HEIGHT)
+                .bounds(area.left(), clearY, halfWidth, SIDEBAR_BUTTON_HEIGHT)
                 .tooltip(Tooltip.create(Component.translatable("tooltip.rnd-block-placer.clear")))
+                .build();
+        shareButton = Button.builder(Component.translatable("button.rnd-block-placer.share"), button -> shareSelection())
+                .bounds(area.right() - halfWidth, clearY, halfWidth, SIDEBAR_BUTTON_HEIGHT)
+                .tooltip(Tooltip.create(Component.translatable("tooltip.rnd-block-placer.share.selection")))
                 .build();
 
         addWidget.accept(weightBox);
         addWidget.accept(confirmButton);
         addWidget.accept(clearButton);
+        addWidget.accept(shareButton);
         updateWidgets();
 
         if (editingId != null) {
@@ -93,6 +105,7 @@ public class SelectionTab extends SidebarTab {
         weightBox.visible = editing;
         confirmButton.visible = editing;
         clearButton.active = !state.isEmpty();
+        shareButton.active = !state.isEmpty();
     }
 
     // Opens the chance editor for the given block, pre-filled with its current percentage
@@ -149,6 +162,16 @@ public class SelectionTab extends SidebarTab {
             return;
         }
         editingText = digits;
+    }
+
+    // Opens the player picker for the working selection, named after its loaded preset when there is one
+    private void shareSelection() {
+        if (state.isEmpty()) {
+            return;
+        }
+        String name = state.getActivePreset();
+        share.accept(name != null ? name : Component.translatable("label.rnd-block-placer.share.selection_name").getString(),
+                state.copyWeights());
     }
 
     private void clearSelection() {

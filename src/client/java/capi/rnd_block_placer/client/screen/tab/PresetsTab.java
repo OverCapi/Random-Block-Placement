@@ -2,6 +2,7 @@ package capi.rnd_block_placer.client.screen.tab;
 
 import capi.rnd_block_placer.client.config.BlockPlacerConfig;
 import capi.rnd_block_placer.client.screen.BlockSelectionScreenState;
+import capi.rnd_block_placer.client.share.PresetShare;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -19,6 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static capi.rnd_block_placer.client.screen.BlockSelectionScreenConstants.*;
@@ -36,6 +38,8 @@ public class PresetsTab extends SidebarTab {
     private enum Armed { NONE, UPDATE, DELETE }
 
     private final BlockSelectionScreenState state;
+    // Opens the player picker for a name and its block weights
+    private final BiConsumer<String, Map<Identifier, Integer>> share;
 
     // Preset the actions apply to, or null
     private String highlighted;
@@ -47,14 +51,17 @@ public class PresetsTab extends SidebarTab {
     private Button loadButton;
     private Button deleteButton;
     private Button updateButton;
+    private Button shareButton;
+    private Button importButton;
     private EditBox nameBox;
     private Button createButton;
     private String createTooltipKey;
     private ScreenRectangle area = ScreenRectangle.empty();
 
-    public PresetsTab(Font font, BlockSelectionScreenState state) {
+    public PresetsTab(Font font, BlockSelectionScreenState state, BiConsumer<String, Map<Identifier, Integer>> share) {
         super(font);
         this.state = state;
+        this.share = share;
     }
 
     @Override
@@ -68,8 +75,14 @@ public class PresetsTab extends SidebarTab {
         int createY = area.bottom() - SIDEBAR_BUTTON_HEIGHT;
         int updateY = createY - BUTTON_ROW_SPACING - SIDEBAR_BUTTON_HEIGHT;
         int loadY = updateY - BUTTON_ROW_SPACING - SIDEBAR_BUTTON_HEIGHT;
+        int importY = loadY - BUTTON_ROW_SPACING - SIDEBAR_BUTTON_HEIGHT;
         int listTop = area.top() + STATUS_HEIGHT;
-        setListArea(new ScreenRectangle(area.left(), listTop, area.width(), loadY - SIDEBAR_SPACING - listTop));
+        setListArea(new ScreenRectangle(area.left(), listTop, area.width(), importY - SIDEBAR_SPACING - listTop));
+
+        importButton = Button.builder(Component.translatable("button.rnd-block-placer.preset.import"), button -> importClipboard())
+                .bounds(area.left(), importY, area.width(), SIDEBAR_BUTTON_HEIGHT)
+                .tooltip(Tooltip.create(Component.translatable("tooltip.rnd-block-placer.preset.import")))
+                .build();
 
         int halfWidth = (area.width() - BUTTON_ROW_SPACING) / 2;
         loadButton = Button.builder(Component.translatable("button.rnd-block-placer.preset.load"), button -> load())
@@ -81,8 +94,12 @@ public class PresetsTab extends SidebarTab {
                 .tooltip(Tooltip.create(Component.translatable("tooltip.rnd-block-placer.preset.delete")))
                 .build();
         updateButton = Button.builder(Component.translatable("button.rnd-block-placer.preset.update"), button -> update())
-                .bounds(area.left(), updateY, area.width(), SIDEBAR_BUTTON_HEIGHT)
+                .bounds(area.left(), updateY, halfWidth, SIDEBAR_BUTTON_HEIGHT)
                 .tooltip(Tooltip.create(Component.translatable("tooltip.rnd-block-placer.preset.update")))
+                .build();
+        shareButton = Button.builder(Component.translatable("button.rnd-block-placer.share"), button -> sharePreset())
+                .bounds(area.right() - halfWidth, updateY, halfWidth, SIDEBAR_BUTTON_HEIGHT)
+                .tooltip(Tooltip.create(Component.translatable("tooltip.rnd-block-placer.share.preset")))
                 .build();
 
         nameBox = new EditBox(font, area.left(), createY, area.width() - CREATE_BUTTON_WIDTH - BUTTON_ROW_SPACING,
@@ -96,9 +113,11 @@ public class PresetsTab extends SidebarTab {
                 .build();
         createTooltipKey = null;
 
+        addWidget.accept(importButton);
         addWidget.accept(loadButton);
         addWidget.accept(deleteButton);
         addWidget.accept(updateButton);
+        addWidget.accept(shareButton);
         addWidget.accept(nameBox);
         addWidget.accept(createButton);
         updateWidgets();
@@ -119,6 +138,7 @@ public class PresetsTab extends SidebarTab {
         updateButton.setMessage(armed == Armed.UPDATE
                 ? Component.translatable("button.rnd-block-placer.preset.confirm").withStyle(ChatFormatting.YELLOW)
                 : Component.translatable("button.rnd-block-placer.preset.update"));
+        shareButton.active = hasTarget;
 
         String blockReason = createBlockReason();
         createButton.active = blockReason == null;
@@ -148,6 +168,25 @@ public class PresetsTab extends SidebarTab {
     private void load() {
         if (highlighted != null) {
             state.loadPreset(highlighted);
+        }
+        armed = Armed.NONE;
+    }
+
+    // Adds the preset whose code is in the clipboard, and highlights it
+    private void importClipboard() {
+        String name = PresetShare.importFromClipboard();
+        if (name != null) {
+            highlighted = name;
+            ensureVisible(presetNames().indexOf(name));
+        }
+        armed = Armed.NONE;
+    }
+
+    // Opens the player picker for the highlighted preset
+    private void sharePreset() {
+        Map<Identifier, Integer> blocks = highlighted == null ? null : BlockPlacerConfig.INSTANCE.getPreset(highlighted);
+        if (blocks != null) {
+            share.accept(highlighted, blocks);
         }
         armed = Armed.NONE;
     }

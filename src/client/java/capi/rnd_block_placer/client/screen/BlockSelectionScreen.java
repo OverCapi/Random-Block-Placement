@@ -23,6 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
 import java.util.List;
+import java.util.Map;
 
 import static capi.rnd_block_placer.client.screen.BlockSelectionScreenConstants.*;
 
@@ -51,8 +52,13 @@ public class BlockSelectionScreen extends Screen {
     public BlockSelectionScreen() {
         super(Component.translatable("screen.rnd-block-placer.title"));
         grid = new InventoryGrid(state, font);
-        selectionTab = new SelectionTab(font, state, this::setFocused);
-        presetsTab = new PresetsTab(font, state);
+        selectionTab = new SelectionTab(font, state, this::setFocused, this::openShare);
+        presetsTab = new PresetsTab(font, state, this::openShare);
+    }
+
+    // Opens the player picker; the working state survives because this screen instance is kept as parent
+    private void openShare(String name, Map<Identifier, Integer> weights) {
+        minecraft.setScreenAndShow(new SharePlayersScreen(this, name, weights));
     }
 
     private SidebarTab activeTab() {
