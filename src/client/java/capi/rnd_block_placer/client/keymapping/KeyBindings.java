@@ -3,6 +3,7 @@ package capi.rnd_block_placer.client.keymapping;
 import capi.rnd_block_placer.RandomBlockPlacer;
 import capi.rnd_block_placer.client.blockPlacer.BlockPlacer;
 import capi.rnd_block_placer.client.screen.BlockSelectionScreen;
+import capi.rnd_block_placer.client.screen.QuickPresetWheelScreen;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
@@ -43,6 +44,17 @@ public final class KeyBindings {
                     )
             );
 
+    // Keybinding: hold to open the quick preset wheel, release to load the pointed preset (default: R)
+    private final KeyMapping quickPresetWheel =
+            KeyMappingHelper.registerKeyMapping(
+                    new KeyMapping(
+                            "key." + RandomBlockPlacer.MOD_ID + ".quick_preset_wheel",
+                            InputConstants.Type.KEYBOARD,
+                            InputConstants.KEY_R,
+                            CATEGORY
+                    )
+            );
+
     public static final KeyBindings INSTANCE = new KeyBindings();
 
     private KeyBindings() {}
@@ -50,6 +62,11 @@ public final class KeyBindings {
     // The key that opens and closes the block selection screen
     public KeyMapping getSelectionScreenKey() {
         return openSelectionScreen;
+    }
+
+    // The key held to keep the quick preset wheel open
+    public KeyMapping getQuickPresetWheelKey() {
+        return quickPresetWheel;
     }
 
     // Registers the client tick handler that checks for key presses
@@ -71,6 +88,13 @@ public final class KeyBindings {
         // Toggle random placement when J is pressed
         while (toggleBlockPlacement.consumeClick()) {
             BlockPlacer.INSTANCE.toggleBlockPlacement();
+        }
+
+        // Open the quick preset wheel while R is held, only from in-game
+        while (quickPresetWheel.consumeClick()) {
+            if (client.gui.screen() == null) {
+                client.setScreenAndShow(new QuickPresetWheelScreen());
+            }
         }
     }
 

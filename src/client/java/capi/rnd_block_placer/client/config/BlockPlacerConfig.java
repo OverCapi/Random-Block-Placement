@@ -3,6 +3,8 @@ package capi.rnd_block_placer.client.config;
 import capi.rnd_block_placer.RandomBlockPlacer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.fabricmc.loader.api.FabricLoader;
@@ -11,6 +13,7 @@ import net.minecraft.resources.Identifier;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -29,6 +32,9 @@ public class BlockPlacerConfig {
     private static final String SAVE_MODE_KEY = "saveMode";
     private static final String MISSING_BLOCK_MODE_KEY = "missingBlockMode";
     private static final String HUD_POSITION_KEY = "hudPosition";
+    private static final String QUICK_PRESETS_KEY = "quickPresets";
+    // Number of slots on the quick preset wheel
+    public static final int QUICK_PRESET_COUNT = 9;
     // Pretty-printing Gson instance for JSON read/write
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
@@ -44,6 +50,8 @@ public class BlockPlacerConfig {
     private MissingBlockMode missingBlockMode = MissingBlockMode.CONTINUE;
     // Where the HUD indicator is drawn
     private HudPosition hudPosition = HudPosition.TOP_CENTER;
+    // Preset name on each quick wheel slot, or null when the slot is empty
+    private final String[] quickPresets = new String[QUICK_PRESET_COUNT];
 
     private BlockPlacerConfig() {}
 
@@ -87,6 +95,11 @@ public class BlockPlacerConfig {
     // Removes the named preset, clearing the active preset if it was removed
     public void removePreset(String name) {
         presets.remove(name);
+        for (int i = 0; i < quickPresets.length; i++) {
+            if (name.equals(quickPresets[i])) {
+                quickPresets[i] = null;
+            }
+        }
         if (name.equals(activePreset)) {
             activePreset = null;
         }
@@ -100,6 +113,27 @@ public class BlockPlacerConfig {
     // Marks the named preset as the current selection
     public void setActivePreset(String name) {
         activePreset = name;
+    }
+
+    // Replaces the selection with the named preset and marks it active; false if it does not exist
+    public boolean loadPreset(String name) {
+        Map<Identifier, Integer> preset = presets.get(name);
+        if (preset == null) {
+            return false;
+        }
+        setSelectedBlocks(preset);
+        activePreset = name;
+        return true;
+    }
+
+    // Returns the preset name on a quick wheel slot, or null when the slot is empty
+    public String getQuickPreset(int slot) {
+        return quickPresets[slot];
+    }
+
+    // Puts a preset on a quick wheel slot, or empties it when name is null
+    public void setQuickPreset(int slot, String name) {
+        quickPresets[slot] = name;
     }
 
     // Clears the current preset selection
@@ -151,6 +185,11 @@ public class BlockPlacerConfig {
             root.addProperty(SAVE_MODE_KEY, saveMode.name());
             root.addProperty(MISSING_BLOCK_MODE_KEY, missingBlockMode.name());
             root.addProperty(HUD_POSITION_KEY, hudPosition.name());
+            JsonArray quick = new JsonArray();
+            for (String name : quickPresets) {
+                quick.add(name);
+            }
+            root.add(QUICK_PRESETS_KEY, quick);
             Files.writeString(getConfigPath(), GSON.toJson(root));
         } catch (IOException e) {
             RandomBlockPlacer.LOGGER.error("Failed to save config file!", e);
@@ -181,6 +220,7 @@ public class BlockPlacerConfig {
             saveMode = parseEnum(root, SAVE_MODE_KEY, SaveMode.ON_CLOSE);
             missingBlockMode = parseEnum(root, MISSING_BLOCK_MODE_KEY, MissingBlockMode.CONTINUE);
             hudPosition = parseEnum(root, HUD_POSITION_KEY, HudPosition.TOP_CENTER);
+            parseQuickPresets(root.getAsJsonArray(QUICK_PRESETS_KEY));
         } catch (IOException | RuntimeException e) {
             RandomBlockPlacer.LOGGER.error("Failed to load config file!", e);
             selectedBlocks.clear();
@@ -189,6 +229,21 @@ public class BlockPlacerConfig {
             saveMode = SaveMode.ON_CLOSE;
             missingBlockMode = MissingBlockMode.CONTINUE;
             hudPosition = HudPosition.TOP_CENTER;
+            Arrays.fill(quickPresets, null);
+        }
+    }
+
+    // Reads the quick wheel slots; names of presets that no longer exist become empty slots
+    private void parseQuickPresets(JsonArray json) {
+        Arrays.fill(quickPresets, null);
+        if (json == null) {
+            return;
+        }
+        for (int i = 0; i < Math.min(json.size(), quickPresets.length); i++) {
+            JsonElement element = json.get(i);
+            if (!element.isJsonNull() && presets.containsKey(element.getAsString())) {
+                quickPresets[i] = element.getAsString();
+            }
         }
     }
 

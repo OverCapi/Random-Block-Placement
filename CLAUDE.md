@@ -40,7 +40,7 @@ State between HEAD and RETURN is kept in `@Unique rbp$*` fields. Mixin members u
 ### Singletons / state
 - `BlockPlacer.INSTANCE`: the enabled/disabled toggle. It is in memory only and is not persisted. `canContinueWithout(missing, player)` applies the `MissingBlockMode` setting: in CONTINUE mode it warns once per missing block and keeps placing with the rest (CONTINUE_QUIET skips the warning), and it turns placement off when nothing is left.
 - `BlockPlacerConfig.INSTANCE`: selected blocks (`Identifier → weight`, default weight 100), named presets, and the active preset. It is persisted as JSON by Gson to `<configDir>/rnd-block-placer.json`. It is loaded in `RandomBlockPlacerClient.onInitializeClient`, and saved explicitly with `save()`.
-- `KeyBindings`: B opens `BlockSelectionScreen`, and J toggles `BlockPlacer`. Both are polled on `ClientTickEvents.END_CLIENT_TICK`.
+- `KeyBindings`: B opens `BlockSelectionScreen`, J toggles `BlockPlacer`, and holding R opens `QuickPresetWheelScreen`. All are polled on `ClientTickEvents.END_CLIENT_TICK`.
 - `HudRndBlockPlacer` shows the enabled indicator with the loaded preset name. Its position comes from the `HudPosition` setting.
 
 ### Selection screen (`client/screen`)
@@ -57,6 +57,13 @@ State between HEAD and RETURN is kept in `@Unique rbp$*` fields. Mixin members u
 - `BlockSelectionScreenConstants`: all layout sizes and colors. Put new layout numbers here.
 - `PanelStyle` draws the shared look (panels, panel titles, header title). Every screen of the mod uses it.
 - `SettingsScreen` uses the same header, panel and footer structure. Enum settings implement `config/TranslatableOption`: labels and tooltips come from `<prefix>.<value>` and `<prefix>.<value>.tooltip`, and the row description from `<prefix>.description`. To add one, add the field to `BlockPlacerConfig` (read it with `parseEnum`) and call `addOptionRow(values, current, setter)` in `init()`. The panel height and control positions are computed from the rows.
+
+### Quick preset wheel
+`BlockPlacerConfig` stores 9 wheel slots (`quickPresets`, preset names or null). `removePreset` empties the slots that point to the removed preset.
+- `QuickPresetWheelScreen` opens while R is held. `segmentAt` maps the cursor angle to a slot: slot 0 is at the top, the others follow clockwise, and the center is a dead zone.
+- The wheel is a ring of 9 slices around a center disc. `drawWheel` draws it one GUI pixel row at a time, with one `fill` for each run of same-colored pixels (`pixelColor`). The pointed slice pops outward by `WHEEL_HOVER_GROW`.
+- Releasing the key (`keyReleased`, or `mouseReleased` when R is rebound to a mouse button) or a left click loads the pointed preset with `BlockPlacerConfig.loadPreset`. It then saves the config and enables placement.
+- A right click on a slot opens `QuickPresetPickerScreen`, which assigns a preset to that slot and saves right away.
 
 ### Preset sharing (`client/share`)
 A vanilla server relays nothing but chat, so sharing goes through `/msg`, or public chat (`sendChat`) from the "Send to public chat" button.

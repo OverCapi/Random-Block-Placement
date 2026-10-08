@@ -2,6 +2,7 @@
 	"key.category.rnd-block-placer.rnd-block-placement": "Random Block Placement",
 	"key.rnd-block-placer.toggle_selection_screen": "Toggle block selection screen",
 	"key.rnd-block-placer.toggle_block_placement": "Toggle block placement",
+	"key.rnd-block-placer.quick_preset_wheel": "Quick preset wheel (hold)",
 	"category.rnd-block-placer": "Random Block Placement",
 	"screen.rnd-block-placer.title": "Random Block Placer",
 	"screen.rnd-block-placer.settings": "Settings",
@@ -122,5 +123,12 @@
 	"chat.rnd-block-placer.share.imported": "Preset \"%s\" imported.",
 	"chat.rnd-block-placer.share.import_missing": "This preset was already imported or has expired.",
 	"chat.rnd-block-placer.share.import_empty": "None of the blocks in this preset exist in your game.",
-	"chat.rnd-block-placer.share.invalid": "Received a damaged preset that could not be read."
+	"chat.rnd-block-placer.share.invalid": "Received a damaged preset that could not be read.",
+	"screen.rnd-block-placer.wheel": "Quick presets",
+	"label.rnd-block-placer.wheel.cancel": "Release to cancel",
+	"label.rnd-block-placer.wheel.empty": "Empty slot",
+	"label.rnd-block-placer.wheel.hint": "Right-click: assign",
+	"screen.rnd-block-placer.wheel_picker": "Wheel slot %s",
+	"button.rnd-block-placer.wheel.clear": "Empty this slot",
+	"label.rnd-block-placer.wheel.no_presets": "No presets yet. Create one in the selection screen (B)."
 }
