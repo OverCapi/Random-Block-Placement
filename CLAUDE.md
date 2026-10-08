@@ -58,6 +58,16 @@ State between HEAD and RETURN is kept in `@Unique rbp$*` fields. Mixin members u
 - `PanelStyle` draws the shared look (panels, panel titles, header title). Every screen of the mod uses it.
 - `SettingsScreen` uses the same header, panel and footer structure. Enum settings implement `config/TranslatableOption`: labels and tooltips come from `<prefix>.<value>` and `<prefix>.<value>.tooltip`, and the row description from `<prefix>.description`. To add one, add the field to `BlockPlacerConfig` (read it with `parseEnum`) and call `addOptionRow(values, current, setter)` in `init()`. The panel height and control positions are computed from the rows.
 
+### Preset sharing (`client/share`)
+A vanilla server relays nothing but chat, so sharing goes through `/msg`, or public chat (`sendChat`) from the "Send to public chat" button.
+- `PresetCodec` is pure. It encodes `name\nid=weight…` (with the `minecraft:` prefix stripped) as Deflate, then URL-safe Base64. It splits the result into lines of the form `[rbp1 <msgId> <i>/<n>] <data>`, sized to fit the 256-char command limit. `main()` runs a round-trip self-check: `java -ea PresetCodec.java`.
+- `PresetShare` queues the `/msg` commands, sending one per second so the server does not kick for spam.
+  - It hides incoming chunks through `ClientReceiveMessageEvents` ALLOW_CHAT/ALLOW_GAME, then reassembles them.
+  - When a share is complete, it posts a chat line with an `[Import]` button. The button runs the client command `/rbp import <token>`. A name conflict gets a ` (n)` suffix.
+  - It ignores its own echoes using the msgIds it sent.
+- Clipboard: "Copy code" in `SharePlayersScreen` copies the unsplit `PresetCodec.encodeData` code. "Import from clipboard" in `PresetsTab` imports it through `PresetShare.importFromClipboard`, which also accepts a single-chunk chat line. Results are shown as toasts, because chat is hidden while a screen is open.
+- `SharePlayersScreen` lets the player pick online players. The Share buttons in `SelectionTab` and `PresetsTab` open it through the `openShare` callback of `BlockSelectionScreen`.
+
 ### Resources
 User-facing strings are translation keys in `src/client/resources/assets/rnd-block-placer/lang/en_us.json`, for example `button.rnd-block-placer.*`, `tooltip.rnd-block-placer.*`, and `label.rnd-block-placer.*`. The screen uses no custom textures.
 

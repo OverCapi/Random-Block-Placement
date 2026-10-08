@@ -3,6 +3,7 @@ package capi.rnd_block_placer.client;
 import capi.rnd_block_placer.client.config.BlockPlacerConfig;
 import capi.rnd_block_placer.client.hud.HudRndBlockPlacer;
 import capi.rnd_block_placer.client.keymapping.KeyBindings;
+import capi.rnd_block_placer.client.share.PresetShare;
 
 import net.fabricmc.api.ClientModInitializer;
 
@@ -15,5 +16,7 @@ public class RandomBlockPlacerClient implements ClientModInitializer {
 		KeyBindings.load();
 		// Register the HUD element showing "ENABLE" status
 		HudRndBlockPlacer.init();
+		// Register preset sharing through /msg
+		PresetShare.init();
 	}
 }
